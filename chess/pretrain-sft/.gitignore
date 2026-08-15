@@ -1,0 +1,22 @@
+__pycache__/
+*.pyc
+.venv/
+.claude/
+.launch-recovery/
+
+# Data files
+*.npy
+data/
+
+# Training artifacts
+checkpoints/
+wandb/
+*.pt
+*.safetensors
+
+# SLURM logs
+slurm_scripts/isoflop_slurm_logs/
+
+# OS / editor
+.DS_Store
+*.swp

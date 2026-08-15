@@ -1,0 +1,88 @@
+% ============================================================================
+%  Appendix: Training configuration (math-pretraining pipeline)
+%  \input{appendix_config} into your paper.
+%  Requires: \usepackage{booktabs}  (and \usepackage{siunitx} is optional;
+%  numbers below are plain text so siunitx is NOT required).
+% ============================================================================
+
+\section{Training Configuration}
+\label{app:config}
+
+We pretrain a 1B-parameter OLMo-2 language model, fork intermediate
+checkpoints as pretraining-scale anchors, anneal each to convergence,
+supervised fine-tune on math reasoning traces, and finally run GRPO
+reinforcement learning. Architecture is fixed across all runs; the only
+variable across anchors is the number of pretraining tokens.
+Tables~\ref{tab:arch} and~\ref{tab:hparams} summarize the setup.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Architecture (OLMo-2)} & \textbf{Value} \\
+\midrule
+Total parameters            & 1.48\,B \\
+Non-embedding parameters    & 1.07\,B \\
+Layers                      & 16 \\
+Hidden size                 & 2048 \\
+FFN intermediate size       & 8192 \\
+Attention heads             & 16 \\
+KV heads (no GQA)           & 16 \\
+Vocabulary size             & 100{,}278 \\
+Max position embeddings     & 8192 \\
+Positional encoding         & RoPE ($\theta=10^4$) \\
+Tied input/output embeddings & No \\
+Precision                   & bf16 \\
+\bottomrule
+\end{tabular}
+\caption{Model architecture. Identical for every pretraining anchor,
+supervised fine-tuning, and reinforcement-learning run.}
+\label{tab:arch}
+\end{table}
+
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{@{}lllll@{}}
+\toprule
+& \textbf{Pretrain (stable)} & \textbf{Anneal} & \textbf{SFT} & \textbf{RL (GRPO)} \\
+\midrule
+Data
+  & Dolma3/Dolmino mix & (same corpus) & NuminaMath-CoT & rl-math-skyeasy25k \\
+Examples / tokens
+  & 200\,B tokens & 5\,B tokens / anchor & 859{,}490 ex.\ ($\approx$0.46\,B tok) & up to 3000 steps \\
+Sequence length
+  & 4096 & 4096 & 4096 (cutoff) & 512 prompt / 3584 resp. \\
+Global batch
+  & 512 seq ($\approx$2.1\,M tok) & 512 seq & 512 examples & 128 prompts $\times$ 8 \\
+Optimizer
+  & AdamW & AdamW & AdamW & AdamW \\
+$(\beta_1,\beta_2)$
+  & (0.9, 0.95) & (0.9, 0.95) & --- & --- \\
+Weight decay
+  & 0.033 (0 on emb.) & 0.033 & --- & --- \\
+Peak LR
+  & $4\times10^{-4}$ & $4\times10^{-4}\!\to\!0$ & $1\times10^{-5}$ & $1\times10^{-6}$ \\
+LR schedule
+  & WSD (warmup+const) & linear decay to 0 & cosine & constant \\
+Warmup
+  & 2\,B tokens & --- & 3\% of steps & 50 steps \\
+Epochs / steps
+  & 95{,}368 steps & --- & 1 epoch (1679 steps) & 3000 steps \\
+Packing
+  & --- & --- & No (one ex.\ / seq) & --- \\
+Loss mask
+  & all tokens & all tokens & assistant only & --- \\
+\bottomrule
+\end{tabular}
+\caption{Hyperparameters for each stage of the pipeline. Pretraining uses a
+warmup--stable--decay (WSD) schedule; intermediate stable-phase checkpoints
+(every 5{,}000--10{,}000 steps) define the pretraining-scale anchors. Each
+anchor is annealed independently (linear LR decay to zero over 5\,B tokens)
+before supervised fine-tuning and reinforcement learning. RL uses GRPO
+(no KL penalty, entropy coefficient 0, dual-clip ratios
+$0.2/0.26$, $c=10$) with 8 rollouts per prompt at temperature 1.0.}
+\label{tab:hparams}
+\end{table}

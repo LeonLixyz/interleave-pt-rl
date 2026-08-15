@@ -1,0 +1,17 @@
+Note that running a local entrypoint in detached mode only keeps the last triggered Modal function alive after the parent process has been killed or disconnected.
+✓ Initialized. View run at 
+https://modal.com/apps/modal-labs/leon-dev/ap-c1M6QhH8hqlI0eDCVazUg6
+✓ Created objects.
+├── 🔨 Created mount 
+│   /private/tmp/claude-501/-Users-leonli66-Desktop-Research-RL-Chess-RL/cf17226
+│   9-6c26-448b-8a10-904c1e927526/scratchpad/eval_loss.py
+└── 🔨 Created function eval_loss.
+`torch_dtype` is deprecated! Use `dtype` instead!
+`torch_dtype` is deprecated! Use `dtype` instead!
+{"tag": "E2W1LOOP@1500", "checkpoint": "/checkpoints/interleave_50m/pretrain/sft_injection_ablation_v1_20260801/../../rl_hf/e2w1loop-lr1e4-rl1500-s1500", "pt_heldout_loss": 0.49094, "pt_windows": 2048, "pt_heldout_shards": [41859, 35917, 27837, 18175, 44567, 44931], "sft_p1half_loss": 0.60298, "sft_p2half_loss": 0.60199, "sft_loss": 0.60249, "sft_tokens": 2731746, "uniform_loss": 0.49153, "sft_share": 0.005220874712203547, "p1_rows": 38859, "p2_rows": 38859}
+{"tag": "E2W1LOOP@1500", "checkpoint": "/checkpoints/interleave_50m/pretrain/sft_injection_ablation_v1_20260801/../../rl_hf/e2w1loop-lr1e4-rl1500-s1500", "pt_heldout_loss": 0.49094, "pt_windows": 2048, "pt_heldout_shards": [41859, 35917, 27837, 18175, 44567, 44931], "sft_p1half_loss": 0.60298, "sft_p2half_loss": 0.60199, "sft_loss": 0.60249, "sft_tokens": 2731746, "uniform_loss": 0.49153, "sft_share": 0.005220874712203547, "p1_rows": 38859, "p2_rows": 38859}
+{"tag": "E3P2LOOP@1500", "checkpoint": "/checkpoints/interleave_50m/pretrain/sft_injection_ablation_v1_20260801/../../rl_hf/e3p2loop-lr1e4-rl1500-s1500", "pt_heldout_loss": 0.48754, "pt_windows": 2048, "pt_heldout_shards": [41859, 35917, 27837, 18175, 44567, 44931], "sft_p1half_loss": 0.57629, "sft_p2half_loss": 0.57338, "sft_loss": 0.57485, "sft_tokens": 2731746, "uniform_loss": 0.48799, "sft_share": 0.005220874712203547, "p1_rows": 38859, "p2_rows": 38859}
+{"tag": "E3P2LOOP@1500", "checkpoint": "/checkpoints/interleave_50m/pretrain/sft_injection_ablation_v1_20260801/../../rl_hf/e3p2loop-lr1e4-rl1500-s1500", "pt_heldout_loss": 0.48754, "pt_windows": 2048, "pt_heldout_shards": [41859, 35917, 27837, 18175, 44567, 44931], "sft_p1half_loss": 0.57629, "sft_p2half_loss": 0.57338, "sft_loss": 0.57485, "sft_tokens": 2731746, "uniform_loss": 0.48799, "sft_share": 0.005220874712203547, "p1_rows": 38859, "p2_rows": 38859}
+[modal-client] 2026-08-09T11:03:01-0400 Timed out waiting for final app logs.
+✓ App completed. View run at 
+https://modal.com/apps/modal-labs/leon-dev/ap-c1M6QhH8hqlI0eDCVazUg6

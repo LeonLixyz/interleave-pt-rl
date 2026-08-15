@@ -1,0 +1,23 @@
+Note that running a local entrypoint in detached mode only keeps the last triggered Modal function alive after the parent process has been killed or disconnected.
+✓ Initialized. View run at 
+https://modal.com/apps/modal-labs/leon-dev/ap-HTDglnPwMM6jubLxS3Saoi
+✓ Created objects.
+├── 🔨 Created mount 
+│   /private/tmp/claude-501/-Users-leonli66-Desktop-Research-RL-Chess-RL/cf17226
+│   9-6c26-448b-8a10-904c1e927526/scratchpad/eval_loss.py
+└── 🔨 Created function eval_loss.
+`torch_dtype` is deprecated! Use `dtype` instead!
+`torch_dtype` is deprecated! Use `dtype` instead!
+`torch_dtype` is deprecated! Use `dtype` instead!
+`torch_dtype` is deprecated! Use `dtype` instead!
+{"tag": "E2W1BAND@1500", "checkpoint": "/checkpoints/interleave_50m/pretrain/sft_injection_ablation_v1_20260801/../../rl_hf/e2w1band-lr1e4-rl1500-s1500", "pt_heldout_loss": 0.51036, "pt_windows": 2048, "pt_heldout_shards": [41859, 35917, 27837, 18175, 44567, 44931], "sft_p1half_loss": 0.75057, "sft_p2half_loss": 0.75417, "sft_loss": 0.75235, "sft_tokens": 2731746, "uniform_loss": 0.51163, "sft_share": 0.005220874712203547, "p1_rows": 38859, "p2_rows": 38859}
+{"tag": "K16BAND@1500", "checkpoint": "/checkpoints/interleave_50m/pretrain/sft_injection_ablation_v1_20260801/../../rl_hf/k16band-lr1e4-rl1500-s1500", "pt_heldout_loss": 0.50091, "pt_windows": 2048, "pt_heldout_shards": [41859, 35917, 27837, 18175, 44567, 44931], "sft_p1half_loss": 0.63322, "sft_p2half_loss": 0.63028, "sft_loss": 0.63177, "sft_tokens": 2731746, "uniform_loss": 0.50159, "sft_share": 0.005220874712203547, "p1_rows": 38859, "p2_rows": 38859}
+{"tag": "K16BAND@1500", "checkpoint": "/checkpoints/interleave_50m/pretrain/sft_injection_ablation_v1_20260801/../../rl_hf/k16band-lr1e4-rl1500-s1500", "pt_heldout_loss": 0.50091, "pt_windows": 2048, "pt_heldout_shards": [41859, 35917, 27837, 18175, 44567, 44931], "sft_p1half_loss": 0.63322, "sft_p2half_loss": 0.63028, "sft_loss": 0.63177, "sft_tokens": 2731746, "uniform_loss": 0.50159, "sft_share": 0.005220874712203547, "p1_rows": 38859, "p2_rows": 38859}
+{"tag": "ROLLBAND@1500", "checkpoint": "/checkpoints/interleave_50m/pretrain/sft_injection_ablation_v1_20260801/../../rl_hf/rollband-lr1e4-rl1500-s1500", "pt_heldout_loss": 0.50106, "pt_windows": 2048, "pt_heldout_shards": [41859, 35917, 27837, 18175, 44567, 44931], "sft_p1half_loss": 0.65236, "sft_p2half_loss": 0.6516, "sft_loss": 0.65198, "sft_tokens": 2731746, "uniform_loss": 0.50185, "sft_share": 0.005220874712203547, "p1_rows": 38859, "p2_rows": 38859}
+{"tag": "E2W1BAND@1500", "checkpoint": "/checkpoints/interleave_50m/pretrain/sft_injection_ablation_v1_20260801/../../rl_hf/e2w1band-lr1e4-rl1500-s1500", "pt_heldout_loss": 0.51036, "pt_windows": 2048, "pt_heldout_shards": [41859, 35917, 27837, 18175, 44567, 44931], "sft_p1half_loss": 0.75057, "sft_p2half_loss": 0.75417, "sft_loss": 0.75235, "sft_tokens": 2731746, "uniform_loss": 0.51163, "sft_share": 0.005220874712203547, "p1_rows": 38859, "p2_rows": 38859}
+{"tag": "ROLLBAND@1500", "checkpoint": "/checkpoints/interleave_50m/pretrain/sft_injection_ablation_v1_20260801/../../rl_hf/rollband-lr1e4-rl1500-s1500", "pt_heldout_loss": 0.50106, "pt_windows": 2048, "pt_heldout_shards": [41859, 35917, 27837, 18175, 44567, 44931], "sft_p1half_loss": 0.65236, "sft_p2half_loss": 0.6516, "sft_loss": 0.65198, "sft_tokens": 2731746, "uniform_loss": 0.50185, "sft_share": 0.005220874712203547, "p1_rows": 38859, "p2_rows": 38859}
+{"tag": "E3P2BAND@1500", "checkpoint": "/checkpoints/interleave_50m/pretrain/sft_injection_ablation_v1_20260801/../../rl_hf/e3p2band-lr1e4-rl1500-s1500", "pt_heldout_loss": 0.50518, "pt_windows": 2048, "pt_heldout_shards": [41859, 35917, 27837, 18175, 44567, 44931], "sft_p1half_loss": 0.67203, "sft_p2half_loss": 0.66838, "sft_loss": 0.67022, "sft_tokens": 2731746, "uniform_loss": 0.50605, "sft_share": 0.005220874712203547, "p1_rows": 38859, "p2_rows": 38859}
+{"tag": "E3P2BAND@1500", "checkpoint": "/checkpoints/interleave_50m/pretrain/sft_injection_ablation_v1_20260801/../../rl_hf/e3p2band-lr1e4-rl1500-s1500", "pt_heldout_loss": 0.50518, "pt_windows": 2048, "pt_heldout_shards": [41859, 35917, 27837, 18175, 44567, 44931], "sft_p1half_loss": 0.67203, "sft_p2half_loss": 0.66838, "sft_loss": 0.67022, "sft_tokens": 2731746, "uniform_loss": 0.50605, "sft_share": 0.005220874712203547, "p1_rows": 38859, "p2_rows": 38859}
+Runner terminated.
+✓ App completed. View run at 
+https://modal.com/apps/modal-labs/leon-dev/ap-HTDglnPwMM6jubLxS3Saoi

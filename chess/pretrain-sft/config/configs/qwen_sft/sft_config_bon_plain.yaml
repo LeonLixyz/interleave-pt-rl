@@ -1,0 +1,92 @@
+# SFT Training Configuration Example
+#
+# This configuration file is for Supervised Fine-Tuning (SFT) on a pretrained model.
+# It uses chat format with thinking tokens for chain-of-thought reasoning.
+
+model:
+  pretrained_model: "/scratch/js15262/LLM-Pretraining/checkpoints/chess_gpt2_pretrained_medium_8B_tokens/hf_Qwen3_0.6B_LanTokenizer_data7025_LNAHNAENA_bs4_lr0.001_warmup1300_shards/final_step6609/hf_model"  
+  block_size: 2048 
+
+tokenizer:
+  name: "LanTokenizerSFT"  # Use SFT-enabled tokenizer
+  include_move_numbers: false
+  include_black_tripledots: false
+  bos: "<bos>"
+  eos: "<eos>"
+  unk: "<unk>"
+  keep_result: false
+
+data:
+  train_files:
+    - "/scratch/js15262/LLM-Pretraining/data/chess/cot_data_bon_tree_depth_1/"
+  
+  # Hold out last N files from train_files for evaluation (like pretrain config)
+  eval_holdout: 2
+
+  
+  # Optional: additional evaluation data (can be empty if using eval_holdout)
+  # eval_files:
+  #   - "/scratch/js15262/LLM-Pretraining/data/chess/cot_data/some_specific_file.json"
+  
+  # SFT-specific settings
+  sft:
+    mask_prompt: true              # Mask prompt tokens in loss (only train on response)
+    cot_field: "cot_by_method.dfs_policy.cot_format"
+
+training:
+  epochs: 3
+  batch_size: 1                    # Smaller batch size for SFT (longer sequences)
+  eval_batch_size: 2
+  
+  # Optimizer settings
+  optimizer:
+    name: "adamw"
+    lr: 1.0e-4                     # Lower learning rate for fine-tuning
+    weight_decay: 0.01
+    betas: [0.9, 0.95]
+  
+  # Scheduler settings
+  scheduler:
+    name: "cosine"
+    warmup_steps: 100              # Fewer warmup steps for fine-tuning
+    eta_min: 1.0e-6
+  
+  # Training optimizations
+  gradient_accumulation_steps: 8   # Effective batch size = 8 * 4 = 32
+  max_grad_norm: 1.0               # Gradient clipping
+  
+  # Regularization
+  label_smoothing: 0.0             # Optional: label smoothing (0.0 = disabled)
+  
+  # Data loading
+  num_workers: 4
+  prefetch_factor: 2
+  persistent_workers: true
+  
+  # Logging and checkpointing
+  save_dir: "/scratch/js15262/LLM-Pretraining/checkpoints/sft/qwen_from_scratch/bon_plain"
+  save_interval: 100               # Save checkpoint every N steps
+  log_interval: 10                 # Log every N steps
+  eval_interval: 100               # Evaluate every N steps
+  eval_max_steps: 50               # Number of eval batches
+  
+  # Model compilation (PyTorch 2.0+)
+  # compile_model: false             # Set to true for additional speedup
+  # compile_mode: "reduce-overhead"
+  
+  # Load pretrained weights
+  pretrained_weights: "/scratch/js15262/LLM-Pretraining/checkpoints/chess_gpt2_pretrained_medium_8B_tokens/hf_Qwen3_0.6B_LanTokenizer_data7025_LNAHNAENA_bs4_lr0.001_warmup1300_shards/final_step6609/model.safetensors"
+  
+  # Resume from checkpoint (optional)
+  # resume: "checkpoints/sft/run_name/step1000"
+
+logging:
+  backend: "wandb"
+  project: "chess-llm-sft-qwen"
+  entity: "jingyanshen-new-york-university"                     # Your wandb entity/username
+  notes: "SFT with thinking tokens"
+  tags:
+    - "sft"
+    - "thinking"
+    - "chess"
+

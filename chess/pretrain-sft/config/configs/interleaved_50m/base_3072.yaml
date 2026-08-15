@@ -1,0 +1,85 @@
+# Base configuration for the controlled 50M-class interleaved
+# pretraining/SFT/RL experiment. Runtime-specific fields such as the manifest,
+# output directory, run name, and number of schedule steps are supplied by
+# modal_scripts/launch_50m_interleaved.py.
+
+model:
+  architecture: "Qwen/Qwen3-0.6B"
+  block_size: 3072
+  n_layer: 12
+  n_head: 8
+  num_key_value_heads: 4
+  head_dim: 128
+  n_embed: 512
+  intermediate_size: 1536
+  dropout: 0.0
+  load_dtype: float32
+  # Never rely on Transformers' version-dependent default attention backend.
+  attn_implementation: sdpa
+  flash_attention_version: "2.8.3"
+
+tokenizer:
+  name: "LanTokenizerSFT"
+  include_move_numbers: false
+  include_black_tripledots: false
+  bos: "<bos>"
+  eos: "<eos>"
+  unk: "<unk>"
+  keep_result: false
+  include_env_tokens: true
+  include_reward_tokens: false
+
+data:
+  start_cursor: 0
+  source_root: "OVERRIDE_ME"
+  source_manifest_path: "OVERRIDE_ME"
+  selection_manifest_path: "OVERRIDE_ME"
+  sft_cache_dir: "OVERRIDE_ME"
+  leg_manifest_path: "OVERRIDE_ME"
+  expected_manifest_hash: "OVERRIDE_ME"
+  sequence_length: 3072
+  sft_prompt_field: "pgn"
+  sft_cot_field: "cot_by_method.trajectory_sep.cot_format_no_labels"
+  num_workers: 8
+  max_open_shards: 64
+
+training:
+  output_dir: "OVERRIDE_ME"
+  run_name: "OVERRIDE_ME"
+  seed: 42
+  local_batch_size: 21
+  gradient_accumulation_steps: 1
+  total_steps: 9920
+  arc_steps: [9920]
+  reset_optimizer_between_arcs: true
+  mixed_precision: bf16
+  torch_compile: none
+  # v1 used 1.0 (raw global valid-token mean). Versioned mixed-objective
+  # protocols may raise this explicitly without changing data exposure.
+  sft_loss_weight: 1.0
+  optimizer:
+    name: adamw
+    lr: 1.0e-3
+    weight_decay: 0.1
+    betas: [0.9, 0.95]
+  scheduler:
+    name: cosine
+    warmup_ratio: 0.05
+    eta_min: 1.0e-5
+  max_grad_norm: 1.0
+  num_workers: 8
+  prefetch_factor: 2
+  persistent_workers: true
+  log_interval: 10
+  save_interval: 200
+  max_checkpoints: 3
+
+logging:
+  backend: wandb
+  entity: "jingyanshen-new-york-university"
+  project: "chess-50m-interleaved-pretrain-rl"
+  mode: online
+  tags:
+    - "50m"
+    - "mixed-pretrain-sft"
+    - "interleaved-rl"

@@ -1,0 +1,29 @@
+{
+  "hf_repo": "pre-to-post-olmo/math-1b-sft-numinamath-bs512-from-step20000",
+  "per_dataset": {
+    "gsm8k": {
+      "n_prompts": 500,
+      "n_samples_per_prompt": 8,
+      "pass_at_1_avg": 0.25575,
+      "pass_at_n": 0.6,
+      "maj_at_n": 0.386
+    },
+    "math500": {
+      "n_prompts": 500,
+      "n_samples_per_prompt": 8,
+      "pass_at_1_avg": 0.12875,
+      "pass_at_n": 0.35,
+      "maj_at_n": 0.192
+    },
+    "skyeasy25k_eval": {
+      "split": "test",
+      "prompt_col": "prompt(auto)",
+      "gold_col": "reward_model.ground_truth(auto)",
+      "n_prompts": 200,
+      "n_samples_per_prompt": 8,
+      "pass_at_1_avg": 0.0025,
+      "pass_at_n": 0.02,
+      "maj_at_n": 0.0
+    }
+  }
+}

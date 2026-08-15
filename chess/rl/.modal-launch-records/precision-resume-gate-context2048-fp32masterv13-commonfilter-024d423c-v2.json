@@ -1,0 +1,13 @@
+{
+  "calls": [
+    {
+      "function_call_id": "fc-01M00PCTHG3GK5ANAS3Q920JAK",
+      "leg": 1
+    }
+  ],
+  "error": "RuntimeError: precision resume gate leg 1 failed: exit 1",
+  "expected_training_call_count": 2,
+  "ledger_sha256": "080678eb6bf271f4de8855351bd6a245978470fdbb2528fe59d21817aa99ada6",
+  "schema": "chess-rl-miles-precision-gate-launch-ledger-v1",
+  "state": "failed"
+}

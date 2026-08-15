@@ -1,0 +1,1009 @@
+diff --git a/miles/backends/experimental/fsdp_utils/actor.py b/miles/backends/experimental/fsdp_utils/actor.py
+index 334cf3936..aca63e7ab 100644
+--- a/miles/backends/experimental/fsdp_utils/actor.py
++++ b/miles/backends/experimental/fsdp_utils/actor.py
+@@ -408,7 +408,34 @@ class FSDPTrainRayActor(TrainRayActor):
+             rollout_data = get_rollout_data(self.args, rollout_data_ref)
+             if self.args.debug_rollout_only:
+                 return
++            # Reset after rollout transfer so the measurement covers only the
++            # policy-update path (reference log probs, actor log probs, and
++            # actor backward/update). The global MAX below makes the canary
++            # fail-safe against one data-parallel rank carrying longer samples.
++            torch.cuda.reset_peak_memory_stats()
+             self._train_core(rollout_id=rollout_id, rollout_data=rollout_data)
++            torch.cuda.synchronize()
++            peak_memory = torch.tensor(
++                [
++                    torch.cuda.max_memory_allocated(),
++                    torch.cuda.max_memory_reserved(),
++                ],
++                dtype=torch.float64,
++                device=torch.cuda.current_device(),
++            )
++            dist.all_reduce(peak_memory, op=dist.ReduceOp.MAX)
++            if dist.get_rank() == 0:
++                allocated, reserved = (
++                    peak_memory / float(1024**3)
++                ).tolist()
++                logger.info(
++                    "policy_update_memory %s: "
++                    "{'peak_allocated_gb_global_max': %.3f, "
++                    "'peak_reserved_gb_global_max': %.3f}",
++                    rollout_id,
++                    allocated,
++                    reserved,
++                )
+ 
+         train_metric_utils.log_perf_data_raw(
+             rollout_id=rollout_id,
+diff --git a/miles/backends/experimental/fsdp_utils/update_weight_utils.py b/miles/backends/experimental/fsdp_utils/update_weight_utils.py
+index 98000e7d3..9336f4f50 100644
+--- a/miles/backends/experimental/fsdp_utils/update_weight_utils.py
++++ b/miles/backends/experimental/fsdp_utils/update_weight_utils.py
+@@ -2,7 +2,7 @@ import abc
+ import logging
+ import socket
+ from argparse import Namespace
+-from collections.abc import Sequence
++from collections.abc import Mapping, Sequence
+ 
+ import ray
+ import torch
+@@ -29,6 +29,25 @@ except ImportError:
+ logger = logging.getLogger(__name__)
+ 
+ 
++def _run_weight_update_session_rpc(rollout_engines: Sequence[ActorHandle], method_name: str) -> None:
++    results = ray.get([getattr(engine, method_name).remote() for engine in rollout_engines])
++    for engine_index, result in enumerate(results):
++        if isinstance(result, Mapping):
++            success = result.get("success", True)
++            message = result.get("error_message") or result.get("message", "unknown error")
++        elif hasattr(result, "success"):
++            success = result.success
++            message = getattr(result, "error_message", None) or getattr(result, "message", "unknown error")
++        else:
++            # Older Ray actors may return None after a successful no-op.
++            continue
++        if success is False:
++            raise RuntimeError(
++                f"SGLang {method_name} failed for rollout engine {engine_index}: {message}. "
++                "The model weights were not safely synchronized."
++            )
++
++
+ class UpdateWeight(abc.ABC):
+     def __init__(self, args: Namespace, model: torch.nn.Module) -> None:
+         self.args = args
+@@ -52,6 +71,7 @@ class UpdateWeight(abc.ABC):
+             futures = [engine.pause_generation.remote() for engine in self.rollout_engines]
+             futures.extend([engine.flush_cache.remote() for engine in self.rollout_engines])
+             ray.get(futures)
++            _run_weight_update_session_rpc(self.rollout_engines, "begin_weight_update")
+         dist.barrier(group=get_gloo_group())
+ 
+         bucket = []
+@@ -82,6 +102,7 @@ class UpdateWeight(abc.ABC):
+ 
+         dist.barrier(group=get_gloo_group())
+         if dist.get_rank() == 0:
++            _run_weight_update_session_rpc(self.rollout_engines, "end_weight_update")
+             ray.get([engine.continue_generation.remote() for engine in self.rollout_engines])
+         dist.barrier(group=get_gloo_group())
+ 
+diff --git a/miles/backends/sglang_utils/arguments.py b/miles/backends/sglang_utils/arguments.py
+index 40853c8d3..88f7334f2 100644
+--- a/miles/backends/sglang_utils/arguments.py
++++ b/miles/backends/sglang_utils/arguments.py
+@@ -2,6 +2,66 @@ from sglang.srt.server_args import ServerArgs
+ from miles.utils.http_utils import _wrap_ipv6
+ 
+ 
++_RENAMED_PARALLEL_SIZE_ARGS = (
++    ("sglang_dp_size", "sglang_data_parallel_size", 1),
++    ("sglang_pp_size", "sglang_pipeline_parallel_size", 1),
++    ("sglang_ep_size", "sglang_expert_parallel_size", 1),
++    ("sglang_attn_cp_size", "sglang_attention_context_parallel_size", 1),
++)
++
++
++def normalize_renamed_args(args):
++    """Normalize SGLang Namespace fields that changed names across releases.
++
++    Newer SGLang releases use the short dataclass field names as argparse
++    destinations (for example, ``dp_size``), while retaining the long names
++    only as CLI aliases. Older releases exposed the long names on the parsed
++    Namespace. Canonical destinations take precedence when both shapes are
++    present.
++    """
++    for canonical_name, legacy_name, default in _RENAMED_PARALLEL_SIZE_ARGS:
++        if not hasattr(args, canonical_name):
++            setattr(args, canonical_name, getattr(args, legacy_name, default))
++
++    # SGLang replaced the piecewise-CUDA-graph booleans with one explicit
++    # prefill-backend destination. Keep both Namespace shapes coherent without
++    # overriding an explicitly parsed canonical backend.
++    canonical_backend_name = "sglang_cuda_graph_backend_prefill"
++    backend_is_available = hasattr(args, canonical_backend_name)
++    backend = getattr(args, canonical_backend_name, None)
++    legacy_disable = getattr(args, "sglang_disable_piecewise_cuda_graph", False)
++    legacy_enforce = getattr(args, "sglang_enforce_piecewise_cuda_graph", False)
++
++    if backend is not None:
++        args.sglang_disable_piecewise_cuda_graph = backend == "disabled"
++        args.sglang_enforce_piecewise_cuda_graph = backend == "tc_piecewise"
++    elif backend_is_available:
++        if legacy_enforce:
++            setattr(args, canonical_backend_name, "tc_piecewise")
++        elif legacy_disable:
++            setattr(args, canonical_backend_name, "disabled")
++
++
++def set_colocate_cuda_graph_default(args):
++    """Disable only prefill CUDA graphs when colocate mode has no explicit policy.
++
++    Returns ``True`` when a default was applied. Decode CUDA graphs are left
++    enabled; this is the canonical equivalent of the legacy
++    ``--disable-piecewise-cuda-graph`` behavior.
++    """
++    normalize_renamed_args(args)
++    prefill_backend = getattr(args, "sglang_cuda_graph_backend_prefill", None)
++    legacy_disable = getattr(args, "sglang_disable_piecewise_cuda_graph", False)
++    legacy_enforce = getattr(args, "sglang_enforce_piecewise_cuda_graph", False)
++    if prefill_backend is not None or legacy_disable or legacy_enforce:
++        return False
++
++    args.sglang_disable_piecewise_cuda_graph = True
++    if hasattr(args, "sglang_cuda_graph_backend_prefill"):
++        args.sglang_cuda_graph_backend_prefill = "disabled"
++    return True
++
++
+ # TODO: use all sglang router arguments with `--sglang-router` prefix
+ def add_sglang_router_arguments(parser):
+     """
+@@ -133,12 +193,9 @@ def add_sglang_arguments(parser):
+ 
+ 
+ def validate_args(args):
++    normalize_renamed_args(args)
++
+     args.sglang_tp_size = args.rollout_num_gpus_per_engine
+-    args.sglang_dp_size = args.sglang_data_parallel_size
+-    args.sglang_pp_size = args.sglang_pipeline_parallel_size
+-    args.sglang_ep_size = args.sglang_expert_parallel_size
+-    if hasattr(args, "sglang_attention_context_parallel_size"):
+-        args.sglang_attn_cp_size = args.sglang_attention_context_parallel_size
+ 
+     if args.true_on_policy_mode:
+         args.sglang_enable_deterministic_inference = True
+@@ -148,7 +205,7 @@ def validate_args(args):
+         args.sglang_enable_deterministic_inference = True
+ 
+     if args.sglang_dp_size > 1:
+-        assert args.sglang_enable_dp_attention
++        assert getattr(args, "sglang_enable_dp_attention", False)
+ 
+     if args.sglang_router_policy:
+         from miles.utils.environ import enable_experimental_rollout_refactor
+diff --git a/miles/backends/sglang_utils/sglang_engine.py b/miles/backends/sglang_utils/sglang_engine.py
+index ee76b3872..2d0fe3d93 100644
+--- a/miles/backends/sglang_utils/sglang_engine.py
++++ b/miles/backends/sglang_utils/sglang_engine.py
+@@ -162,6 +162,16 @@ class SGLangEngine(RayActor):
+         ip_part, port_part = dist_init_addr.rsplit(":", 1)
+         dist_init_addr = f"{_format_v6_uri(ip_part)}:{port_part}"
+ 
++        if self.base_gpu_id is not None and not os.environ.get("CUDA_VISIBLE_DEVICES"):
++            gpus_per_engine = self.num_gpus_per_engine or self.args.rollout_num_gpus_per_engine
++            if gpus_per_engine == 1:
++                os.environ["CUDA_VISIBLE_DEVICES"] = str(self.base_gpu_id)
++                logger.info(
++                    "Set CUDA_VISIBLE_DEVICES=%s for SGLang rank %s",
++                    os.environ["CUDA_VISIBLE_DEVICES"],
++                    self.rank,
++                )
++
+         server_args_dict, external_engine_need_check_fields = _compute_server_args(
+             self.args,
+             self.rank,
+@@ -514,6 +524,54 @@ class SGLangEngine(RayActor):
+         response.raise_for_status()
+         return response
+ 
++    def _weight_update_session_request(self, endpoint: str, payload: dict):
++        """Call a transactional weight-update endpoint when the server supports it.
++
++        SGLang versions before the begin/update/end protocol do not expose
++        these routes. Cache a 404/405 as a legacy capability result so their
++        non-transactional update endpoints continue to work unchanged.
++        """
++        if getattr(self, "_weight_update_sessions_supported", None) is False:
++            return {
++                "success": True,
++                "message": "Legacy SGLang server does not expose transactional weight updates.",
++                "session_supported": False,
++            }
++
++        try:
++            result = self._make_request(endpoint, payload)
++        except requests.exceptions.HTTPError as error:
++            status_code = getattr(getattr(error, "response", None), "status_code", None)
++            can_fall_back_to_legacy = (
++                endpoint == "begin_weight_update"
++                and getattr(self, "_weight_update_sessions_supported", None) is not True
++                and status_code in (404, 405)
++            )
++            if not can_fall_back_to_legacy:
++                raise
++            self._weight_update_sessions_supported = False
++            logger.warning(
++                "SGLang endpoint /%s is unavailable (HTTP %s); using the legacy non-transactional weight-update protocol.",
++                endpoint,
++                status_code,
++            )
++            return {
++                "success": True,
++                "message": "Legacy SGLang server does not expose transactional weight updates.",
++                "session_supported": False,
++            }
++
++        self._weight_update_sessions_supported = True
++        return result
++
++    def begin_weight_update(self, selector: str = "all"):
++        """Open a weight-update transaction on current SGLang servers."""
++        return self._weight_update_session_request("begin_weight_update", {"selector": selector})
++
++    def end_weight_update(self):
++        """Finalize and close the current SGLang weight-update transaction."""
++        return self._weight_update_session_request("end_weight_update", {})
++
+     def post_process_weights(
+         self,
+         restore_weights_before_load: bool = False,
+diff --git a/miles/backends/training_utils/loss.py b/miles/backends/training_utils/loss.py
+index 084d44952..6dc99d850 100644
+--- a/miles/backends/training_utils/loss.py
++++ b/miles/backends/training_utils/loss.py
+@@ -1,6 +1,7 @@
+ from argparse import Namespace
+ 
+ import torch
++import torch.distributed as dist
+ from torch.utils.checkpoint import checkpoint
+ 
+ from miles.backends.training_utils.cp_utils import get_sum_of_sample_mean
+@@ -17,8 +18,9 @@ def compute_advantages_and_returns(args: Namespace, rollout_data: RolloutBatch)
+ 
+     This function extracts rewards, log-probs, values, and masks from
+     `rollout_data`, computes KL divergences, then applies the chosen advantage
+-    estimator. Supported methods: "grpo", "gspo", "ppo", "reinforce_plus_plus",
+-    "reinforce_plus_plus_baseline", and "on_policy_distillation". When
++    estimator. Supported methods: "grpo", "gspo", "cispo", "ppo",
++    "reinforce_plus_plus", "reinforce_plus_plus_baseline", and
++    "on_policy_distillation". When
+     `args.normalize_advantages` is True, advantages are whitened across the
+     data-parallel group using masked statistics.
+ 
+@@ -110,6 +112,7 @@ def loss_function(
+           "values" (1D tensor: [count, metric1, metric2, ...]).
+     """
+     parallel_state = get_parallel_state()
++    use_token_mean_loss = args.calculate_per_token_loss or getattr(args, "policy_loss_agg_mode", None) == "token-mean"
+     num_tokens = sum([torch.clamp_min(loss_mask.sum(), 1) for loss_mask in batch["loss_masks"]])
+     num_samples = len(batch["response_lengths"])
+ 
+@@ -117,7 +120,7 @@ def loss_function(
+         batch["total_lengths"],
+         batch["response_lengths"],
+         batch["loss_masks"],
+-        args.calculate_per_token_loss,
++        use_token_mean_loss,
+         args.qkv_format,
+         batch.get("max_seq_lens", None),
+     )
+@@ -142,7 +145,7 @@ def loss_function(
+     # Here we need to divide by cp_size because to cancel the multiply in Megatron.
+     assert args.use_dynamic_global_batch_size == ("dynamic_global_batch_size" in batch)
+     global_batch_size = batch.get("dynamic_global_batch_size", args.global_batch_size)
+-    if not args.calculate_per_token_loss:
++    if not use_token_mean_loss:
+         if apply_megatron_loss_scaling:
+             loss_parallel_size = (
+                 parallel_state.intra_dp.size
+@@ -155,18 +158,26 @@ def loss_function(
+     else:
+         if apply_megatron_loss_scaling:
+             loss = loss * parallel_state.cp.size
++        else:
++            global_num_tokens = num_tokens.detach().clone()
++            dist.all_reduce(global_num_tokens, op=dist.ReduceOp.SUM, group=parallel_state.intra_dp_cp.group)
++            global_num_tokens = global_num_tokens / parallel_state.cp.size
++            loss = loss / torch.clamp_min(global_num_tokens, 1) * parallel_state.intra_dp.size
++
++    def as_log_tensor(value):
++        if isinstance(value, torch.Tensor):
++            return value.detach().to(device=logits.device, dtype=logits.dtype).reshape(())
++        return torch.tensor(value, device=logits.device, dtype=logits.dtype)
++
++    normalizer = num_tokens.to(device=logits.device) if use_token_mean_loss else torch.tensor(1, device=logits.device)
++    count = num_tokens if use_token_mean_loss else num_samples
++    values = torch.stack([as_log_tensor(count)] + [as_log_tensor(value) for value in log.values()])
+ 
+     return (
+         loss,
+-        torch.tensor(num_tokens if args.calculate_per_token_loss else 1, device=logits.device),
++        normalizer,
+         {
+             "keys": list(log.keys()),
+-            "values": torch.tensor(
+-                [
+-                    num_samples if not args.calculate_per_token_loss else num_tokens,
+-                ]
+-                + list(log.values()),
+-                device=logits.device,
+-            ),
++            "values": values,
+         },
+     )
+diff --git a/miles/backends/training_utils/loss_hub/advantages.py b/miles/backends/training_utils/loss_hub/advantages.py
+index a3a8c2a9a..5e1af67fc 100644
+--- a/miles/backends/training_utils/loss_hub/advantages.py
++++ b/miles/backends/training_utils/loss_hub/advantages.py
+@@ -29,7 +29,7 @@ def compute_advantages(
+     Returns:
+         (advantages, returns) — both lists of tensors, one per sample.
+     """
+-    if args.advantage_estimator in ["grpo", "gspo"]:
++    if args.advantage_estimator in ["grpo", "gspo", "cispo"]:
+         rewards = torch.tensor(rewards, dtype=torch.float32, device=kl[0].device)
+         returns = get_grpo_returns(rewards, kl)
+         # TODO: is the copy necessary?
+diff --git a/miles/backends/training_utils/loss_hub/losses.py b/miles/backends/training_utils/loss_hub/losses.py
+index 2944573ce..a66b73688 100644
+--- a/miles/backends/training_utils/loss_hub/losses.py
++++ b/miles/backends/training_utils/loss_hub/losses.py
+@@ -13,6 +13,7 @@ from miles.backends.training_utils.loss_hub.corrections import vanilla_tis_funct
+ from miles.backends.training_utils.loss_hub.logit_processors import get_log_probs_and_entropy, get_values
+ from miles.backends.training_utils.loss_hub.math_utils import (
+     compute_approx_kl,
++    compute_cispo_policy_loss,
+     compute_ess_ratio_contribution,
+     compute_gspo_kl,
+     compute_opsm_mask,
+@@ -175,7 +176,16 @@ def policy_loss_function(
+         advantages.new_zeros(()),
+     )
+ 
+-    pg_loss, pg_clipfrac = compute_policy_loss(ppo_kl, advantages, args.eps_clip, args.eps_clip_high)
++    if args.advantage_estimator == "cispo":
++        pg_loss, pg_clipfrac = compute_cispo_policy_loss(
++            ppo_kl,
++            log_probs,
++            advantages,
++            args.cispo_clip_min,
++            args.cispo_clip_max,
++        )
++    else:
++        pg_loss, pg_clipfrac = compute_policy_loss(ppo_kl, advantages, args.eps_clip, args.eps_clip_high)
+ 
+     if getattr(args, "dump_details", None) is not None:
+         from miles.backends.training_utils.debug_dump import maybe_dump_policy_loss_debug
+diff --git a/miles/backends/training_utils/loss_hub/math_utils.py b/miles/backends/training_utils/loss_hub/math_utils.py
+index 0a46b0c0f..a86ce90d9 100644
+--- a/miles/backends/training_utils/loss_hub/math_utils.py
++++ b/miles/backends/training_utils/loss_hub/math_utils.py
+@@ -255,6 +255,21 @@ def compute_policy_loss(
+     return pg_losses, clipfrac
+ 
+ 
++@torch.compile(dynamic=True)
++def compute_cispo_policy_loss(
++    ppo_kl: torch.Tensor,
++    log_probs: torch.Tensor,
++    advantages: torch.Tensor,
++    clip_min: float,
++    clip_max: float,
++):
++    ratio = (-ppo_kl).exp()
++    clipped_ratio_sg = ratio.clamp(clip_min, clip_max).detach()
++    pg_losses = -clipped_ratio_sg * advantages * log_probs
++    clipfrac = ((ratio < clip_min) | (ratio > clip_max)).float()
++    return pg_losses, clipfrac
++
++
+ def compute_log_probs(
+     logits: torch.Tensor,
+     tokens: torch.Tensor,
+diff --git a/miles/ray/rollout.py b/miles/ray/rollout.py
+index e1ba42c2d..be0a557e7 100644
+--- a/miles/ray/rollout.py
++++ b/miles/ray/rollout.py
+@@ -646,7 +646,7 @@ class RolloutManager:
+ 
+         raw_rewards = [sample.get_reward_value(self.args) for sample in samples]
+         if (
+-            self.args.advantage_estimator in ["grpo", "gspo", "reinforce_plus_plus_baseline"]
++            self.args.advantage_estimator in ["grpo", "gspo", "cispo", "reinforce_plus_plus_baseline"]
+             and self.args.rewards_normalization
+         ):
+             # group norm
+@@ -659,7 +659,7 @@ class RolloutManager:
+             mean = rewards.mean(dim=-1, keepdim=True)
+             rewards = rewards - mean
+ 
+-            if self.args.advantage_estimator in ["grpo", "gspo"] and self.args.grpo_std_normalization:
++            if self.args.advantage_estimator in ["grpo", "gspo", "cispo"] and self.args.grpo_std_normalization:
+                 std = rewards.std(dim=-1, keepdim=True)
+                 rewards = rewards / (std + 1e-6)
+ 
+diff --git a/miles/rollout/inference_rollout/inference_rollout_eval.py b/miles/rollout/inference_rollout/inference_rollout_eval.py
+index 274777679..46a3895cc 100644
+--- a/miles/rollout/inference_rollout/inference_rollout_eval.py
++++ b/miles/rollout/inference_rollout/inference_rollout_eval.py
+@@ -1,6 +1,8 @@
+ import asyncio
+ import copy
+ import logging
++import os
++import sys
+ from typing import Any
+ 
+ from tqdm import tqdm
+@@ -19,6 +21,18 @@ from miles.utils.types import Sample
+ logger = logging.getLogger(__name__)
+ 
+ 
++def _progress_enabled() -> bool:
++    if os.environ.get("MILES_DISABLE_TQDM", "").lower() in {"1", "true", "yes"}:
++        return False
++    stream = getattr(sys, "stderr", None)
++    if stream is None or getattr(stream, "closed", False):
++        return False
++    try:
++        return stream.isatty()
++    except Exception:
++        return False
++
++
+ async def eval_rollout_single_dataset(
+     state: GenerateState,
+     dataset_cfg: EvalDatasetConfig,
+@@ -83,7 +97,7 @@ async def eval_rollout_single_dataset(
+ 
+     data = []
+     do_print = True
+-    pbar = tqdm(total=len(tasks), desc=f"Eval {dataset_cfg.name}", disable=not do_print)
++    pbar = tqdm(total=len(tasks), desc=f"Eval {dataset_cfg.name}", disable=not (do_print and _progress_enabled()))
+     async for sample in as_completed_async(tasks):
+         if do_print:
+             # TODO improve this after enhancing samples' type
+diff --git a/miles/rollout/inference_rollout/inference_rollout_train.py b/miles/rollout/inference_rollout/inference_rollout_train.py
+index eed15557b..c7f2e2d37 100644
+--- a/miles/rollout/inference_rollout/inference_rollout_train.py
++++ b/miles/rollout/inference_rollout/inference_rollout_train.py
+@@ -1,5 +1,7 @@
+ import asyncio
+ import logging
++import os
++import sys
+ from argparse import Namespace
+ from collections.abc import Callable
+ 
+@@ -8,6 +10,7 @@ from packaging.version import parse
+ from tqdm import tqdm
+ 
+ from miles.rollout.base_types import RolloutFnTrainOutput
++from miles.rollout.env_reply_ordering import sort_groups_by_env_reply_count
+ from miles.rollout.filter_hub.base_types import MetricGatherer, call_dynamic_filter
+ from miles.rollout.generate_utils.prefill_logprobs import recompute_samples_rollout_logprobs_via_prefill
+ from miles.rollout.inference_rollout.inference_rollout_common import GenerateState, generate_and_rm_group
+@@ -19,6 +22,18 @@ from miles.utils.types import Sample
+ logger = logging.getLogger(__name__)
+ 
+ 
++def _progress_enabled() -> bool:
++    if os.environ.get("MILES_DISABLE_TQDM", "").lower() in {"1", "true", "yes"}:
++        return False
++    stream = getattr(sys, "stderr", None)
++    if stream is None or getattr(stream, "closed", False):
++        return False
++    try:
++        return stream.isatty()
++    except Exception:
++        return False
++
++
+ async def abort(state: GenerateState, pendings: set, rollout_id: int) -> list[list[Sample]]:
+     args = state.args
+ 
+@@ -57,6 +72,7 @@ async def get_worker_urls(args: Namespace):
+ 
+ 
+ def submit_generate_tasks(state: GenerateState, samples: list[list[Sample]]):
++    samples = sort_groups_by_env_reply_count(samples)
+     return [
+         asyncio.create_task(
+             # submit a group of samples as a single task.
+@@ -91,7 +107,11 @@ async def generate_rollout_async(
+     data = []
+     all_data = []
+     do_print = True
+-    pbar = tqdm(total=target_data_size * args.n_samples_per_prompt, desc="Rollout generation")
++    pbar = tqdm(
++        total=target_data_size * args.n_samples_per_prompt,
++        desc="Rollout generation",
++        disable=not _progress_enabled(),
++    )
+     while len(data) < target_data_size:
+         while len(data) + len(pendings) < target_data_size:
+             # get samples from the buffer and submit the generation requests.
+diff --git a/miles/rollout/sglang_rollout.py b/miles/rollout/sglang_rollout.py
+index c00166508..169868a5f 100644
+--- a/miles/rollout/sglang_rollout.py
++++ b/miles/rollout/sglang_rollout.py
+@@ -1,6 +1,8 @@
+ import asyncio
+ import copy
+ import logging
++import os
++import sys
+ import uuid
+ from argparse import Namespace
+ from collections.abc import Callable
+@@ -31,6 +33,7 @@ from miles.utils.processing_utils import (
+ )
+ from miles.utils.types import Sample
+ 
++from .env_reply_ordering import sort_groups_by_env_reply_count
+ from .generate_utils.prefill_logprobs import recompute_samples_rollout_logprobs_via_prefill
+ from .rm_hub import async_rm, batched_async_rm
+ 
+@@ -39,6 +42,18 @@ __all__ = ["generate_rollout", "get_model_url"]
+ logger = logging.getLogger(__name__)
+ 
+ 
++def _progress_enabled() -> bool:
++    if os.environ.get("MILES_DISABLE_TQDM", "").lower() in {"1", "true", "yes"}:
++        return False
++    stream = getattr(sys, "stderr", None)
++    if stream is None or getattr(stream, "closed", False):
++        return False
++    try:
++        return stream.isatty()
++    except Exception:
++        return False
++
++
+ def get_model_url(args: Namespace, model_name: str, endpoint: str = "/generate") -> str:
+     """Return the router URL for a named model.
+ 
+@@ -71,8 +86,13 @@ class GenerateState(metaclass=SingletonMeta):
+         )
+         self.processor = load_processor(args.hf_checkpoint, trust_remote_code=True)
+ 
+-        self.semaphore = asyncio.Semaphore(
+-            args.sglang_server_concurrency * args.rollout_num_gpus // args.rollout_num_gpus_per_engine
++        num_engines = args.rollout_num_gpus // args.rollout_num_gpus_per_engine
++        self.semaphore = asyncio.Semaphore(args.sglang_server_concurrency * num_engines)
++        eval_server_concurrency = getattr(args, "eval_sglang_server_concurrency", None)
++        self.eval_semaphore = (
++            asyncio.Semaphore(eval_server_concurrency * num_engines)
++            if eval_server_concurrency is not None
++            else self.semaphore
+         )
+         self.sampling_params: dict[str, Any] = dict(
+             temperature=args.rollout_temperature,
+@@ -114,6 +134,7 @@ class GenerateState(metaclass=SingletonMeta):
+         self.aborted = False
+ 
+     def submit_generate_tasks(self, samples: list[list[Sample]]) -> None:
++        samples = sort_groups_by_env_reply_count(samples)
+         for group in samples:
+             self.pendings.add(
+                 asyncio.create_task(
+@@ -252,7 +273,8 @@ async def generate_and_rm(
+     state = GenerateState(args)
+ 
+     # generate
+-    async with state.semaphore:
++    semaphore = state.eval_semaphore if evaluation else state.semaphore
++    async with semaphore:
+         if state.aborted:
+             sample.status = Sample.Status.ABORTED
+             return sample
+@@ -409,7 +431,11 @@ async def generate_rollout_async(
+     data = []
+     all_data = []
+     do_print = True
+-    pbar = tqdm(total=target_data_size * args.n_samples_per_prompt, desc="Rollout generation")
++    pbar = tqdm(
++        total=target_data_size * args.n_samples_per_prompt,
++        desc="Rollout generation",
++        disable=not _progress_enabled(),
++    )
+     while len(data) < target_data_size:
+         while state.remaining_batch_size < target_data_size:
+             # get samples from the buffer and submit the generation requests.
+@@ -569,7 +595,7 @@ async def eval_rollout_single_dataset(
+ 
+     data = []
+     do_print = True
+-    pbar = tqdm(total=len(tasks), desc=f"Eval {dataset_cfg.name}", disable=not do_print)
++    pbar = tqdm(total=len(tasks), desc=f"Eval {dataset_cfg.name}", disable=not (do_print and _progress_enabled()))
+     for coro in asyncio.as_completed(tasks):
+         sample = await coro
+         if do_print:
+diff --git a/miles/router/router.py b/miles/router/router.py
+index 51194be4c..beb9a2d10 100644
+--- a/miles/router/router.py
++++ b/miles/router/router.py
+@@ -1,5 +1,6 @@
+ import argparse
+ import asyncio
++import hashlib
+ import json
+ import logging
+ 
+@@ -14,6 +15,8 @@ from miles.utils.misc import load_function
+ 
+ logger = logging.getLogger(__name__)
+ 
++_ROUTING_KEY_HEADER = "x-smg-routing-key"
++
+ 
+ def run_router(args):
+     """
+@@ -44,6 +47,9 @@ class MilesRouter:
+         self.worker_failure_counts: dict[str, int] = {}
+         # Quarantined workers excluded from routing pool
+         self.dead_workers: set[str] = set()
++        # Stable route selected when a key is first seen. First assignment is
++        # load-aware so prompt-group affinity does not create a hash-skewed GPU.
++        self.routing_key_workers: dict[str, str] = {}
+         self.max_weight_version = None
+ 
+         max_connections = getattr(args, "miles_router_max_connections", None)
+@@ -144,13 +150,17 @@ class MilesRouter:
+         headers: dict | None = None,
+     ) -> dict:
+         """Core proxy logic. Returns dict with request_body, response_body, status_code, headers."""
+-        worker_url = self._use_url()
+-        url = f"{worker_url}/{path}"
+-
+         if body is None:
+             body = await request.body()
+         if headers is None:
+             headers = dict(request.headers)
++        routing_key = next(
++            (value for key, value in headers.items() if key.lower() == _ROUTING_KEY_HEADER),
++            None,
++        )
++        worker_url = self._use_url(routing_key=routing_key)
++        url = f"{worker_url}/{path}"
++
+         if body is not None:
+             headers = {k: v for k, v in headers.items() if k.lower() not in ("content-length", "transfer-encoding")}
+ 
+@@ -213,19 +223,28 @@ class MilesRouter:
+         """List all registered workers"""
+         return {"urls": list(self.worker_request_counts.keys())}
+ 
+-    def _use_url(self):
+-        """Select worker URL with minimal active requests."""
++    def _use_url(self, routing_key: str | None = None):
++        """Select a healthy worker, optionally with stable per-key affinity."""
++
++        valid_workers = tuple(worker for worker in self.worker_request_counts if worker not in self.dead_workers)
++        if not valid_workers:
++            raise RuntimeError("No healthy workers available in the pool")
+ 
+-        if not self.dead_workers:
+-            # Healthy path: select from all workers
+-            url = min(self.worker_request_counts, key=self.worker_request_counts.get)
++        if routing_key:
++            url = self.routing_key_workers.get(routing_key)
++            if url not in valid_workers:
++                min_load = min(self.worker_request_counts[worker] for worker in valid_workers)
++                least_loaded = tuple(
++                    worker for worker in valid_workers if self.worker_request_counts[worker] == min_load
++                )
++                key_bytes = routing_key.encode("utf-8")
++                url = max(
++                    least_loaded,
++                    key=lambda worker: hashlib.sha256(key_bytes + b"\0" + worker.encode("utf-8")).digest(),
++                )
++                self.routing_key_workers[routing_key] = url
+         else:
+-            # Degraded path: select from workers not in dead_workers
+-            valid_workers = (w for w in self.worker_request_counts if w not in self.dead_workers)
+-            try:
+-                url = min(valid_workers, key=self.worker_request_counts.get)
+-            except ValueError:
+-                raise RuntimeError("No healthy workers available in the pool") from None
++            url = min(valid_workers, key=self.worker_request_counts.get)
+ 
+         self.worker_request_counts[url] += 1
+         return url
+diff --git a/miles/utils/arguments.py b/miles/utils/arguments.py
+index df8317ef5..d3044cb91 100644
+--- a/miles/utils/arguments.py
++++ b/miles/utils/arguments.py
+@@ -9,6 +9,8 @@ from sglang_router.launch_router import RouterArgs
+ from transformers import AutoConfig
+ 
+ from miles.backends.sglang_utils.arguments import add_sglang_arguments
++from miles.backends.sglang_utils.arguments import normalize_renamed_args as normalize_sglang_args
++from miles.backends.sglang_utils.arguments import set_colocate_cuda_graph_default
+ from miles.backends.sglang_utils.arguments import validate_args as sglang_validate_args
+ from miles.utils.chat_template_utils.tito_tokenizer import TITOTokenizerType
+ from miles.utils.environ import enable_experimental_rollout_refactor
+@@ -817,6 +819,21 @@ def get_miles_extra_args_provider(add_custom_arguments=None):
+                 default=1,
+                 help="number of responses for each prompt in generation",
+             )
++            parser.add_argument(
++                "--eval-sglang-server-concurrency",
++                type=int,
++                default=None,
++                help=(
++                    "Per-engine SGLang generation concurrency to use during eval. "
++                    "If unset, eval uses --sglang-server-concurrency."
++                ),
++            )
++            parser.add_argument(
++                "--eval-generate-max-retries",
++                type=int,
++                default=300,
++                help="Maximum HTTP retries for each eval /generate request.",
++            )
+             parser.add_argument("--eval-temperature", type=float, default=None)
+             parser.add_argument("--eval-top-p", type=float, default=None)
+             parser.add_argument("--eval-top-k", type=int, default=None)
+@@ -840,6 +857,15 @@ def get_miles_extra_args_provider(add_custom_arguments=None):
+             parser.add_argument(
+                 "--ref-ckpt-step", type=int, default=None, help="The checkpoint step for reference model. "
+             )
++            parser.add_argument(
++                "--ckpt-step",
++                type=int,
++                default=None,
++                help=(
++                    "The actor checkpoint step to load from --load. If unset, the loader reads "
++                    "latest_checkpointed_iteration.txt from --load."
++                ),
++            )
+             reset_arg(parser, "--load", type=str, default=None)
+             reset_arg(parser, "--save", type=str, default=None)
+             reset_arg(parser, "--save-interval", type=int, default=None)
+@@ -866,6 +892,16 @@ def get_miles_extra_args_provider(add_custom_arguments=None):
+             reset_arg(parser, "--seed", type=int, default=1234)
+             reset_arg(parser, "--clip-grad", type=float, default=1.0)
+             reset_arg(parser, "--calculate-per-token-loss", action="store_true")
++            parser.add_argument(
++                "--policy-loss-agg-mode",
++                type=str,
++                choices=["seq-mean-token-mean", "token-mean"],
++                default="seq-mean-token-mean",
++                help=(
++                    "Policy loss aggregation. 'seq-mean-token-mean' preserves the Miles default; "
++                    "'token-mean' matches veRL actor_rollout_ref.actor.loss_agg_mode=token-mean."
++                ),
++            )
+             reset_arg(parser, "--lr", type=float, default=1e-6)
+ 
+             parser.add_argument("--num-critic-only-steps", type=int, default=0, help="Number of critic only steps")
+@@ -926,6 +962,7 @@ def get_miles_extra_args_provider(add_custom_arguments=None):
+                 choices=[
+                     "grpo",
+                     "gspo",
++                    "cispo",
+                     "reinforce_plus_plus",
+                     "reinforce_plus_plus_baseline",
+                     "ppo",
+@@ -933,6 +970,18 @@ def get_miles_extra_args_provider(add_custom_arguments=None):
+                 ],
+                 default="grpo",
+             )
++            parser.add_argument(
++                "--cispo-clip-min",
++                type=float,
++                default=0.0,
++                help="CISPO lower bound for clipping the direct importance ratio.",
++            )
++            parser.add_argument(
++                "--cispo-clip-max",
++                type=float,
++                default=5.0,
++                help="CISPO upper bound for clipping the direct importance ratio.",
++            )
+             parser.add_argument(
+                 "--disable-compute-advantages-and-returns",
+                 action="store_false",
+@@ -1795,10 +1844,9 @@ def parse_args(add_custom_arguments=None):
+         assert args.context_parallel_size == 1, "Context parallelism is not supported for FSDP backend."
+ 
+         if not args.ci_test:
+-            raise ValueError(
+-                "The FSDP backend has known issues with SGLang v0.5.10 and is not actively maintained in the current version. "
+-                "It has been moved to miles.backends.experimental. "
+-                "Contributions are welcome if you are interested in improving it."
++            logger.warning(
++                "The FSDP backend is marked experimental in Miles. Continuing because production scripts in this "
++                "checkout use it, but Megatron remains the preferred backend for maximum throughput."
+             )
+ 
+     miles_validate_args(args)
+@@ -1880,6 +1928,7 @@ def _resolve_eval_datasets(args) -> list[EvalDatasetConfig]:
+ 
+ 
+ def miles_validate_args(args):
++    normalize_sglang_args(args)
+     args.eval_datasets = _resolve_eval_datasets(args)
+ 
+     if args.recompute_logprobs_via_prefill:
+@@ -2030,6 +2079,18 @@ def miles_validate_args(args):
+             "require advantage normalization. Please add `--normalize-advantages` to your command."
+         )
+ 
++    if args.advantage_estimator == "cispo":
++        assert args.cispo_clip_min >= 0.0, f"cispo_clip_min must be non-negative, got {args.cispo_clip_min}"
++        assert args.cispo_clip_max > args.cispo_clip_min, (
++            f"cispo_clip_max must be greater than cispo_clip_min, "
++            f"got {args.cispo_clip_max} <= {args.cispo_clip_min}"
++        )
++
++    if args.eval_sglang_server_concurrency is not None:
++        assert args.eval_sglang_server_concurrency > 0, (
++            f"eval_sglang_server_concurrency must be positive, got {args.eval_sglang_server_concurrency}"
++        )
++
+     if args.use_rollout_logprobs:
+         assert not args.use_tis, "use_rollout_logprobs and use_tis cannot be set at the same time."
+ 
+@@ -2111,13 +2172,15 @@ def miles_validate_args(args):
+             args.offload_train = True
+         if args.offload_rollout is None:
+             args.offload_rollout = True
+-        if args.sglang_enforce_piecewise_cuda_graph:
+-            logger.warning("Warning: colocate mode with --sglang-enforce-piecewise-cuda-graph may trigger NVLS OOM.")
+-        if not args.sglang_disable_piecewise_cuda_graph:
+-            args.sglang_disable_piecewise_cuda_graph = True
++        enforce_piecewise_cuda_graph = getattr(args, "sglang_enforce_piecewise_cuda_graph", False)
++        if enforce_piecewise_cuda_graph:
++            logger.warning(
++                "Warning: colocate mode with the tc_piecewise prefill CUDA-graph backend may trigger NVLS OOM."
++            )
++        if set_colocate_cuda_graph_default(args):
+             logger.info(
+-                "Colocate mode: defaulting --sglang-disable-piecewise-cuda-graph to avoid NVLS OOM. "
+-                "Use --sglang-enforce-piecewise-cuda-graph to override."
++                "Colocate mode: defaulting the SGLang prefill CUDA-graph backend to disabled to avoid NVLS OOM. "
++                "Set --sglang-cuda-graph-backend-prefill explicitly to override."
+             )
+         if args.rollout_num_gpus != args.actor_num_gpus_per_node * args.actor_num_nodes:
+             logger.info(
+diff --git a/miles/utils/tracking_utils/wandb_utils.py b/miles/utils/tracking_utils/wandb_utils.py
+index 7b5f1f661..5111bf70f 100644
+--- a/miles/utils/tracking_utils/wandb_utils.py
++++ b/miles/utils/tracking_utils/wandb_utils.py
+@@ -46,9 +46,11 @@ def init_wandb_primary(args):
+     if (not offline) and args.wandb_key is not None:
+         wandb.login(key=args.wandb_key, host=args.wandb_host)
+ 
+-    # Prepare wandb init parameters
+-    # add random 6 length string with characters
+-    if args.wandb_random_suffix:
++    requested_run_name = getattr(args, "wandb_run_name", None)
++    if requested_run_name:
++        group = args.wandb_group or requested_run_name
++        run_name = requested_run_name
++    elif args.wandb_random_suffix:
+         group = args.wandb_group + "_" + wandb.util.generate_id()
+         run_name = f"{group}-RANK_{args.rank}"
+     else:
+diff --git a/tests/fast/router/test_router.py b/tests/fast/router/test_router.py
+index 4211b2336..24f24823c 100644
+--- a/tests/fast/router/test_router.py
++++ b/tests/fast/router/test_router.py
+@@ -159,6 +159,44 @@ class TestLoadBalancing:
+         with pytest.raises(RuntimeError, match="No healthy workers"):
+             router._use_url()
+ 
++    def test_routing_key_is_sticky_even_when_worker_load_changes(self, router_factory):
++        router = router_factory()
++        router.worker_request_counts = {"http://w1:8000": 0, "http://w2:8000": 0, "http://w3:8000": 0}
++
++        selected = router._use_url(routing_key="trajectory-17")
++        router._finish_url(selected)
++        router.worker_request_counts[selected] = 100
++
++        assert router._use_url(routing_key="trajectory-17") == selected
++
++    def test_routing_key_remaps_away_from_dead_worker(self, router_factory):
++        router = router_factory()
++        router.worker_request_counts = {"http://w1:8000": 0, "http://w2:8000": 0, "http://w3:8000": 0}
++
++        selected = router._use_url(routing_key="trajectory-23")
++        router._finish_url(selected)
++        router.dead_workers.add(selected)
++
++        replacement = router._use_url(routing_key="trajectory-23")
++        assert replacement != selected
++        assert replacement not in router.dead_workers
++
++        router._finish_url(replacement)
++        assert router._use_url(routing_key="trajectory-23") == replacement
++
++    def test_new_routing_keys_are_balanced_before_becoming_sticky(self, router_factory):
++        router = router_factory()
++        router.worker_request_counts = {"http://w1:8000": 0, "http://w2:8000": 0, "http://w3:8000": 0}
++
++        selected_by_key = {}
++        for group_index in range(12):
++            key = f"group-{group_index}"
++            selected_by_key[key] = [router._use_url(routing_key=key) for _ in range(8)]
++
++        assert all(len(set(workers)) == 1 for workers in selected_by_key.values())
++        loads = list(router.worker_request_counts.values())
++        assert max(loads) - min(loads) <= 8
++
+ 
+ # TODO: extract main body inside `_health_check_loop`, then can test that function
+ class TestHealthCheck:
+@@ -200,6 +238,19 @@ class TestProxyIntegration:
+         assert len(all_requests) == 4
+         assert all(req == payload for req in all_requests)
+ 
++    def test_proxy_honors_routing_key(self, router_env: RouterEnv, mock_worker_factory):
++        worker1, worker2 = mock_worker_factory(), mock_worker_factory()
++        requests.post(f"{router_env.url}/add_worker", params={"url": worker1.url}, timeout=5.0)
++        requests.post(f"{router_env.url}/add_worker", params={"url": worker2.url}, timeout=5.0)
++
++        payload = {"input_ids": [1, 2, 3], "return_logprob": True}
++        headers = {"X-SMG-Routing-Key": "trajectory-42"}
++        for _ in range(3):
++            requests.post(f"{router_env.url}/generate", json=payload, headers=headers, timeout=10.0).raise_for_status()
++
++        request_counts = [len(worker1.request_log), len(worker2.request_log)]
++        assert sorted(request_counts) == [0, 3]
++
+     def test_proxy_health_endpoint(self, router_env: RouterEnv, mock_worker: MockSGLangServer):
+         requests.post(f"{router_env.url}/add_worker", params={"url": mock_worker.url}, timeout=5.0)
+ 
+diff --git a/train.py b/train.py
+index 9a4a29550..baf07b243 100644
+--- a/train.py
++++ b/train.py
+@@ -1,5 +1,7 @@
+ import asyncio
++import os
+ 
++import ray
+ from sglang.srt.constants import GPU_MEMORY_TYPE_CUDA_GRAPH, GPU_MEMORY_TYPE_KV_CACHE, GPU_MEMORY_TYPE_WEIGHTS
+ 
+ from miles.ray.placement_group import create_placement_groups, create_rollout_manager, create_training_models
+@@ -12,6 +14,21 @@ from miles.utils.tracking_utils import finish_tracking, init_tracking
+ 
+ async def train(args):
+     configure_logger()
++    if not ray.is_initialized():
++        if os.environ.get("RAY_ADDRESS"):
++            ray_init_kwargs = {
++                "address": os.environ["RAY_ADDRESS"],
++                "ignore_reinit_error": True,
++            }
++        else:
++            ray_init_kwargs = {
++                "include_dashboard": False,
++                "ignore_reinit_error": True,
++                "num_cpus": os.cpu_count(),
++                "num_gpus": args.num_gpus_per_node,
++            }
++        ray.init(**ray_init_kwargs)
++
+     # allocate the GPUs
+     pgs = create_placement_groups(args)
+     init_tracking(args)

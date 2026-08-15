@@ -1,0 +1,28 @@
+diff --git a/training/trainer_hf.py b/training/trainer_hf.py
+--- a/training/trainer_hf.py
++++ b/training/trainer_hf.py
+@@ -1554,5 +1554,6 @@ class HFTrainer:
+     def _expand_txt_files(self, dcfg):
+         """Return a sorted list[Path] of shard files from config."""
++        import re
+         from pathlib import Path
+         def expand_one(p):
+             p = Path(p)
+@@ -1580,7 +1581,16 @@ class HFTrainer:
+             raise ValueError("Config must provide data.txt_files or data.txt_path")
+ 
+         # de-dup & sort by name for stable shard order
+-        uniq = sorted({Path(p).resolve() for p in out}, key=lambda p: p.name)
++        # The April pretraining workspace ordered numeric shard suffixes
++        # numerically, so raw.24773/raw.24774 were the final eval holdout.
++        def shard_sort_key(path):
++            match = re.search(r"(\d+)(?=\.[^.]+$)", path.name)
++            if match is None:
++                return (path.name, -1, "")
++            return (
++                path.name[:match.start()], int(match.group(1)), path.suffix
++            )
++        uniq = sorted({Path(p).resolve() for p in out}, key=shard_sort_key)
+         if not uniq:
+             raise FileNotFoundError("No shards found from data paths.")
+         return uniq

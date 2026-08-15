@@ -1,0 +1,16 @@
+Note that running a local entrypoint in detached mode only keeps the last triggered Modal function alive after the parent process has been killed or disconnected.
+✓ Initialized. View run at 
+https://modal.com/apps/modal-labs/leon-dev/ap-iTMXTUvDPq2CVHs2rbiA6S
+✓ Created objects.
+├── 🔨 Created mount 
+│   /private/tmp/claude-501/-Users-leonli66-Desktop-Research-RL-Chess-RL/cf17226
+│   9-6c26-448b-8a10-904c1e927526/scratchpad/eval_loss.py
+└── 🔨 Created function eval_loss.
+`torch_dtype` is deprecated! Use `dtype` instead!
+`torch_dtype` is deprecated! Use `dtype` instead!
+{"tag": "E2W1LOOP@0", "checkpoint": "/checkpoints/interleave_50m/pretrain/sft_injection_ablation_v1_20260801/e2w1loop/final", "pt_heldout_loss": 0.47626, "pt_windows": 2048, "pt_heldout_shards": [41859, 35917, 27837, 18175, 44567, 44931], "sft_p1half_loss": 0.51766, "sft_p2half_loss": 0.51798, "sft_loss": 0.51782, "sft_tokens": 2731746, "uniform_loss": 0.47648, "sft_share": 0.005220874712203547, "p1_rows": 38859, "p2_rows": 38859}
+{"tag": "E2W1LOOP@0", "checkpoint": "/checkpoints/interleave_50m/pretrain/sft_injection_ablation_v1_20260801/e2w1loop/final", "pt_heldout_loss": 0.47626, "pt_windows": 2048, "pt_heldout_shards": [41859, 35917, 27837, 18175, 44567, 44931], "sft_p1half_loss": 0.51766, "sft_p2half_loss": 0.51798, "sft_loss": 0.51782, "sft_tokens": 2731746, "uniform_loss": 0.47648, "sft_share": 0.005220874712203547, "p1_rows": 38859, "p2_rows": 38859}
+{"tag": "E3P2LOOP@0", "checkpoint": "/checkpoints/interleave_50m/pretrain/sft_injection_ablation_v1_20260801/e3p2loop/final", "pt_heldout_loss": 0.47686, "pt_windows": 2048, "pt_heldout_shards": [41859, 35917, 27837, 18175, 44567, 44931], "sft_p1half_loss": 0.51934, "sft_p2half_loss": 0.51808, "sft_loss": 0.51872, "sft_tokens": 2731746, "uniform_loss": 0.47708, "sft_share": 0.005220874712203547, "p1_rows": 38859, "p2_rows": 38859}
+{"tag": "E3P2LOOP@0", "checkpoint": "/checkpoints/interleave_50m/pretrain/sft_injection_ablation_v1_20260801/e3p2loop/final", "pt_heldout_loss": 0.47686, "pt_windows": 2048, "pt_heldout_shards": [41859, 35917, 27837, 18175, 44567, 44931], "sft_p1half_loss": 0.51934, "sft_p2half_loss": 0.51808, "sft_loss": 0.51872, "sft_tokens": 2731746, "uniform_loss": 0.47708, "sft_share": 0.005220874712203547, "p1_rows": 38859, "p2_rows": 38859}
+✓ App completed. View run at 
+https://modal.com/apps/modal-labs/leon-dev/ap-iTMXTUvDPq2CVHs2rbiA6S

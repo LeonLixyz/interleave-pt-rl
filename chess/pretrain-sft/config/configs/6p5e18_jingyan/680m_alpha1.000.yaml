@@ -1,0 +1,58 @@
+# C_total=6.5e18, alpha=1.000
+# Model: ~680M
+# Pretrain tokens: 1,598,918,000 (1394 shards, 1392 train + 2 eval)
+# Optimizer steps on 8 GPUs: 3,049
+#
+# This reconstructs the config used by the completed historical W&B run
+# 8b6p25mr. Its recorded command referenced this exact path, and its logs
+# recorded 3,049 optimizer steps on 8x H200.
+
+model:
+  architecture: "Qwen/Qwen3-0.6B"
+  block_size: 1024
+  n_layer: 30
+  n_head: 20
+  num_key_value_heads: 4
+  head_dim: 128
+  n_embed: 1280
+  intermediate_size: 3840
+  dropout: 0.0
+
+training:
+  device: "cuda"
+  batch_size: 32
+  gradient_accumulation_steps: 2
+  epochs: 1
+  experiment_name: "680m_C_6p5e18_alpha1.000"
+  optimizer:
+    name: adamw
+    lr: 1e-3
+    weight_decay: 0.1
+    betas: [0.9, 0.95]
+  scheduler:
+    name: cosine
+    eta_min: 1e-4
+    warmup_ratio: 0.05
+  max_grad_norm: 1.0
+  log_interval: 10
+  num_workers: 8
+  save_dir: "checkpoints"
+
+data:
+  txt_path: "/data/pretrain_v1_20b"
+  pretrain_tokens: 1598918000
+  eval_holdout: 2
+
+tokenizer:
+  name: "LanTokenizer"
+  special_tokens: ["<bos>", "<eos>", "<pad>"]
+  include_move_numbers: false
+
+logging:
+  backend: "wandb"
+  entity: "jingyanshen-new-york-university"
+  project: "chess-scaling-C_6p5e18"
+  notes: "C=6.5e18 alpha=1.000 680m fresh reconstruction"
+  tags: ["C_6p5e18", "alpha1.000", "680m"]
+  mode: "online"
+  hf_upload_repo: "chess-pre-to-post/6p5e18_680m_alpha1.000"

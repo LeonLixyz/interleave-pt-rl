@@ -1,0 +1,22 @@
+{
+  "hf_repo": "pre-to-post-olmo/math-1b-sft-openthoughts-from-step90000",
+  "per_dataset": {
+    "gsm8k": {
+      "n_prompts": 1319,
+      "n_samples_per_prompt": 1,
+      "pass_at_1_avg": 0.02047005307050796,
+      "pass_at_n": 0.02047005307050796,
+      "maj_at_n": 0.02047005307050796
+    },
+    "skyeasy25k_eval": {
+      "split": "test",
+      "prompt_col": "prompt(auto)",
+      "gold_col": "reward_model.ground_truth(auto)",
+      "n_prompts": 500,
+      "n_samples_per_prompt": 1,
+      "pass_at_1_avg": 0.004,
+      "pass_at_n": 0.004,
+      "maj_at_n": 0.004
+    }
+  }
+}

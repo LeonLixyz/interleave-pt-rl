@@ -1,0 +1,102 @@
+{
+  "app": {
+    "app_id": "ap-ScCyVCCvkygnaNd1uNHq0f",
+    "dashboard_url": "https://modal.com/apps/modal-labs/leon-dev/ap-ScCyVCCvkygnaNd1uNHq0f",
+    "final_log_at": "2026-07-30T15:56:53-04:00",
+    "final_state": "stopped",
+    "tasks_after_stop": 0
+  },
+  "contract": {
+    "bytes": 12817,
+    "contract_sha256": "d80e77b2e80149342983a5d37ed90cc3c2b74e058c51a108a950435171198940",
+    "file_sha256": "7478421ad104e538e7a38c01a7f1d0695d726965bbb21dad5a7e1a9e9d20196f",
+    "local_path": "INTERLEAVED_V2R4C_RUNTIME_CONTRACT.json",
+    "remote_path": "50m_interleaved_mix10b_sft90k_v2r1_clean_verify_gate/v2r4c_production_gate_20260730/runtime_contract.json",
+    "remote_redownload_byte_identical": true
+  },
+  "disposition": {
+    "contract_may_be_overwritten": false,
+    "failed_ledger_may_be_overwritten": false,
+    "failed_version_may_be_relaunched": false,
+    "fresh_version_and_names_required": true,
+    "grid_authorized": false,
+    "prompt_artifacts_may_be_reused": true,
+    "reason_prompt_reuse_is_valid": "No package user code, prompt read, rollout child, GPU run root, reward, response, or outcome was produced or inspected."
+  },
+  "failure": {
+    "exception": "ModuleNotFoundError: No module named 'chess_rl_miles'",
+    "failed_import": "from chess_rl_miles.provenance import ...",
+    "launcher_container_path": "/root/modal_v2r4c_gate.py",
+    "launcher_source_file_sha256": "d0d635283a95752e4a05266191c63d633b2eb28ebea9bc8088c41ad298407aa7",
+    "line": 14,
+    "phase": "cpu_preflight_import",
+    "root_cause": "The direct-file Modal launcher was imported from /root before /root/chess-rl-miles was inserted into sys.path.",
+    "user_function_body_entered": false
+  },
+  "function_call": {
+    "call_graph_children": [],
+    "dashboard_url": "https://modal.com/id/fc-01KYT9E8019J10C6FST75VNVP8",
+    "function_call_id": "fc-01KYT9E8019J10C6FST75VNVP8",
+    "function_name": "v2r4c_preflight",
+    "input_status": "TERMINATED",
+    "module_name": "modal_v2r4c_gate",
+    "termination": "cancelled_by_user_after_repeated_identical_import_failures"
+  },
+  "gpu_and_outcome_boundary": {
+    "canary_function_call_spawned": false,
+    "canary_root_absent": true,
+    "grid_function_calls_spawned": 0,
+    "grid_roots_absent": true,
+    "outcome_exposure": false,
+    "remote_call_children": 0,
+    "rollout_user_code_entered": false
+  },
+  "launcher_ledger": {
+    "bytes": 449,
+    "calls": [],
+    "embedded_ledger_sha256": "0d919f6bb083a89bd34c75867d56edcf8da96b1241dac636a606c8bd42feffc6",
+    "file_sha256": "27e9a093cba15a31129a00f99049db0b6ca4e554079c17f25552880375342fde",
+    "path": "INTERLEAVED_V2R4C_CANARY_LAUNCH_LEDGER.json",
+    "state": "preflight_failed"
+  },
+  "platform_import_attempts": {
+    "cuda_banners": 12,
+    "first_container_log_at": "2026-07-30T15:53:54-04:00",
+    "first_import_failure_at": "2026-07-30T15:53:55-04:00",
+    "identical_import_failures": 12,
+    "last_import_failure_at": "2026-07-30T15:55:38-04:00",
+    "runner_failures": 12,
+    "task_ids": [
+      "ta-01KYT9E8D9R2YX2NJQGZV4K3FR",
+      "ta-01KYT9ECNGQ5TX90ZY69VYDSCR",
+      "ta-01KYT9EGWTRKBT0NGA3D50EB1R",
+      "ta-01KYT9EMQ1G5RXJV5AFWN6WBNR",
+      "ta-01KYT9EVGTGTDEE2ZB7NY930RR",
+      "ta-01KYT9EZW0D52S9TWJMZX1ED2R",
+      "ta-01KYT9F3XW56HWVWZJJ5PPDZXR",
+      "ta-01KYT9FAHW8AWWE7ZVBAC12KQR",
+      "ta-01KYT9FFYH3X5J3F2SW74GJ28R",
+      "ta-01KYT9FNF6RG3TNNK3GA6CAHMR",
+      "ta-01KYT9G07GD4N13W69YAPW3W6R",
+      "ta-01KYT9H9VV76G39NS15CKMSD7R"
+    ]
+  },
+  "report_sha256": "2a2eaeb867d73366b69377e6f965a925eff0c3db8bd8bae881ec4d035e3ec5f0",
+  "schema": "interleaved-v2r4c-preflight-incident-report-v1",
+  "source_freeze": {
+    "amendment_file_sha256": "b01acaa41f3a75fdceac4b1fbd8d6859da9eadbebdc20ad8a434d94c38d548f7",
+    "amendment_path": "INTERLEAVED_V2R4C_GATE_AMENDMENT.md",
+    "freeze_version": "v2r4c-source-freeze-s3",
+    "launcher_test_file_sha256": "d1b1cd7317285d98952156ed967b8be96ab90014444d7c2744346029cd435ffe"
+  },
+  "verified_absent_roots": [
+    "chess-rl-miles-interleave/v2r4c-runtime-canary-s6000-seed13477620",
+    "chess-rl-miles-interleave/v2r4c-gate-w190-s6000-batch-a",
+    "chess-rl-miles-interleave/v2r4c-gate-w190-s6000-batch-b",
+    "chess-rl-miles-interleave/v2r4c-gate-w190-s8000-batch-a",
+    "chess-rl-miles-interleave/v2r4c-gate-w190-s8000-batch-b",
+    "chess-rl-miles-interleave/v2r4c-gate-w190-s9920-batch-a",
+    "chess-rl-miles-interleave/v2r4c-gate-w190-s9920-batch-b"
+  ],
+  "version": "v2r4c_production_gate_20260730"
+}

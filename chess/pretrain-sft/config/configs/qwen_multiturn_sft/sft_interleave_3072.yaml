@@ -1,0 +1,69 @@
+# SFT config for the interleave experiment — replicates the sweep recipe that
+# produced chess-pre-to-post/sft_trajectory_no_labels (reverse-engineered from the
+# uploaded C6p5e18_20m_alpha1.000_beta0.008 checkpoint's optimizer/scheduler state):
+#   lr 3e-4 peak (via --lr), cosine -> eta_min 1e-5, warmup 50 steps, 3 epochs,
+#   batch 4/GPU x grad_accum 32 x 2 GPUs = effective 256, block_size 3072 (via
+#   --block-size; yarn rope factor 3.0 added automatically for ctx-1024 models),
+#   no packing, prompt + env-move masking, fp32 (no mixed precision).
+# pretrained_model / spec naming are passed on the CLI by the Modal launcher.
+
+model:
+  pretrained_model: "OVERRIDE_ME_VIA_CLI"
+  block_size: 3072
+
+tokenizer:
+  name: "LanTokenizerSFT"
+  include_move_numbers: false
+  include_black_tripledots: false
+  bos: "<bos>"
+  eos: "<eos>"
+  unk: "<unk>"
+  keep_result: false
+  include_env_tokens: true
+
+data:
+  data_name: "200m_generated"
+  train_files:
+    - "/root/sft_data"
+  eval_holdout: 2
+  max_train_files: 134
+  sft:
+    mask_prompt: true
+    cot_field: "cot_by_method.trajectory_sep.cot_format_no_labels"
+    cot_type: "trajectory_sep_no_labels"
+    multi_turn: true
+
+training:
+  epochs: 3
+  batch_size: 4
+  eval_batch_size: 2
+  optimizer:
+    name: "adamw"
+    lr: 5.0e-5   # overridden to 3e-4 via --lr
+    weight_decay: 0.01
+    betas: [0.9, 0.95]
+  scheduler:
+    name: "cosine"
+    warmup_steps: 50
+    eta_min: 1.0e-5
+  gradient_accumulation_steps: 32
+  max_grad_norm: 1.0
+  label_smoothing: 0.0
+  num_workers: 4
+  prefetch_factor: 2
+  persistent_workers: true
+  save_dir: "/checkpoints/sft_interleave"
+  save_interval: 100
+  log_interval: 50
+  eval_interval: 10000
+  eval_max_steps: 50
+
+logging:
+  backend: "wandb"
+  project: "chess-llm-sft-qwen-200m-multiturn"
+  entity: "jingyanshen-new-york-university"
+  notes: "Interleave experiment SFT (recipe replica of sft_trajectory_no_labels sweep)"
+  tags:
+    - "sft"
+    - "chess"
+    - "interleave"

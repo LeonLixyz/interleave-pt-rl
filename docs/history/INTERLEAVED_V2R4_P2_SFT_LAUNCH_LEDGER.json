@@ -1,0 +1,104 @@
+{
+  "app_name": "chess-interleave-v2r4-p2-sft-eval",
+  "calls": [
+    {
+      "app_name": "chess-interleave-v2r4-p2-sft-eval",
+      "expected_result_path": "/results/v2r4_p2_sft_at_p1_20260730/v2r4-w190-step6000/5df40e4794193a490297e19837ea5d8ec49326329ab405e58234b67519862425/_SUCCESS.json",
+      "function_call_id": "fc-01KYT0D6T2F746QECE0B5P99WF",
+      "function_name": "evaluate_p2_sft_candidate",
+      "kwargs": {
+        "candidate_step": 6000,
+        "expected_endpoint_checkpoint_sha256": "17acd19dd1e89390c609a3f0f6c72ab543b8869f2d2ffd10528c8fe84cb20690",
+        "expected_recursive_hf_identity": "5df40e4794193a490297e19837ea5d8ec49326329ab405e58234b67519862425",
+        "runtime_contract_sha256": "d9ade6a543168a152338b599fd8867aca34a3e807e2fd0f831fecb21385e5896"
+      }
+    },
+    {
+      "app_name": "chess-interleave-v2r4-p2-sft-eval",
+      "expected_result_path": "/results/v2r4_p2_sft_at_p1_20260730/v2r4-w190-step8000/d17a709df6debd483932e3e38214a91a1ec1f62814dd73dd6cad1f51a9b6070e/_SUCCESS.json",
+      "function_call_id": "fc-01KYT0D6WH1930552H5CMWX3Z1",
+      "function_name": "evaluate_p2_sft_candidate",
+      "kwargs": {
+        "candidate_step": 8000,
+        "expected_endpoint_checkpoint_sha256": "e1006a970b5b7c9c9e5aefdbae3c716740e69970c0bcb4bb32b4cbab7af43634",
+        "expected_recursive_hf_identity": "d17a709df6debd483932e3e38214a91a1ec1f62814dd73dd6cad1f51a9b6070e",
+        "runtime_contract_sha256": "d9ade6a543168a152338b599fd8867aca34a3e807e2fd0f831fecb21385e5896"
+      }
+    },
+    {
+      "app_name": "chess-interleave-v2r4-p2-sft-eval",
+      "expected_result_path": "/results/v2r4_p2_sft_at_p1_20260730/v2r4-w190-step9920/d0c013bf51c17691ef9bdf5e5d65561912471ef949a161f80b4aa818da96c4fd/_SUCCESS.json",
+      "function_call_id": "fc-01KYT0D6Z9Z4ZWD8C0MD88RVSM",
+      "function_name": "evaluate_p2_sft_candidate",
+      "kwargs": {
+        "candidate_step": 9920,
+        "expected_endpoint_checkpoint_sha256": "9a89d52a60b87b0f27108e5b08e33395757e374a4b59a592babb9435edb4b1c8",
+        "expected_recursive_hf_identity": "d0c013bf51c17691ef9bdf5e5d65561912471ef949a161f80b4aa818da96c4fd",
+        "runtime_contract_sha256": "d9ade6a543168a152338b599fd8867aca34a3e807e2fd0f831fecb21385e5896"
+      }
+    }
+  ],
+  "evaluator_source_sha256": "2dd8dd0cbffd4d0e86cc8c484a94917a5aa9cf7bf32309a6398ef33d717612c5",
+  "expected_call_count": 3,
+  "function_name": "evaluate_p2_sft_candidate",
+  "ledger_hash": "80e2db571cd34376e6d287822a55cbc892f944c7a7387552bda23c26cfe73e99",
+  "preflight": {
+    "all_three_result_roots_absent": true,
+    "cache_shape_hash": "6b8b068a1d02480d9c0a9933c19a534bb64eb15fe16e9ae7a313f4ea66c4d5c5",
+    "checkpoints": {
+      "6000": {
+        "directory_manifest_sha256": "3285baeb7c6ca4de2a320522906b031f6538c75106cb13fddc68194c96d23d70",
+        "endpoint_checkpoint_sha256": "17acd19dd1e89390c609a3f0f6c72ab543b8869f2d2ffd10528c8fe84cb20690",
+        "recursive_hf_identity": "5df40e4794193a490297e19837ea5d8ec49326329ab405e58234b67519862425",
+        "training_state_sha256": "5f6707dc5d641b64b9bd90b3cfd857c61943c6892ea6a33997eca609ceb91e0f"
+      },
+      "8000": {
+        "directory_manifest_sha256": "13fde44ba75511e8cd7d23a9e73db507bade841fcc682dc2851261690e918758",
+        "endpoint_checkpoint_sha256": "e1006a970b5b7c9c9e5aefdbae3c716740e69970c0bcb4bb32b4cbab7af43634",
+        "recursive_hf_identity": "d17a709df6debd483932e3e38214a91a1ec1f62814dd73dd6cad1f51a9b6070e",
+        "training_state_sha256": "0b1312d9a758c890a90b3ac704a4561ab9b5aaf666bc8fddac4240777c9b8e4b"
+      },
+      "9920": {
+        "directory_manifest_sha256": "49fe6fe87d78ba58ebd96cf154567bd1526b6c12a4193809652b875a7af5d186",
+        "endpoint_checkpoint_sha256": "9a89d52a60b87b0f27108e5b08e33395757e374a4b59a592babb9435edb4b1c8",
+        "recursive_hf_identity": "d0c013bf51c17691ef9bdf5e5d65561912471ef949a161f80b4aa818da96c4fd",
+        "training_state_sha256": "b042157d06bb7b89b1a69cb190cbde1e5d17455e76eda9f8c15639d90d4c05b7"
+      }
+    },
+    "data": {
+      "artifact_sha256": {
+        "legs/p1/metadata.json": "b3a67af83912a6f82290b23ff7463b22e9cb9cad6403e9d2a54c783d588a55ba",
+        "legs/p1/order.npy": "68fc5a3934ea677f31365d998f67380e7b5d2fa12f7b5bbbed9756a3f8bd9ac4",
+        "legs/p2/metadata.json": "2536c129a5bbd04c082533b9a4ffed2d318723ea8ac3dec6b85583f217691eed",
+        "legs/p2/order.npy": "95d70dfc4474be1b8b301196875db511f9c9d63036332ca6913dd0504d7c17b8",
+        "manifest_set.json": "d2d741998a258ed1367587f922df07e0d7a2b46d906a965208c781e1380feb6e",
+        "sft_cache/input_ids.i32": "c8c75b6eec58c6d9943a799d04f3e054221f4e2207873b521e5b8eae548bb8a8",
+        "sft_cache/labels.i32": "7bb6b16fdd6a7fe1b1e0702f21e9535334421a5c12d074848f60f8d76d357373",
+        "sft_cache/metadata.json": "48b30362e729603798a14daa2c9f42e484fd68942a689c763d18095e8f3baeac",
+        "sft_cache/offsets.npy": "0c6f777a79ae8f0d397f1e623724e30137fa5c89060efed1ba24e5ce48c83701"
+      },
+      "cache_shape_hash": "6b8b068a1d02480d9c0a9933c19a534bb64eb15fe16e9ae7a313f4ea66c4d5c5",
+      "input_ids_bytes": 270404728,
+      "labels_bytes": 270404728,
+      "selection_hash": "99d20a1ee7dad9ab88ab5de2dfe0df50cc9d9e076636cf41252fbb1db2ea371e"
+    },
+    "preflight_hash": "e320a8b673242c076620ed4ec6ebc5e18b4be269295e45f99f93cd78cc768487",
+    "result_roots": {
+      "6000": "/results/v2r4_p2_sft_at_p1_20260730/v2r4-w190-step6000/5df40e4794193a490297e19837ea5d8ec49326329ab405e58234b67519862425",
+      "8000": "/results/v2r4_p2_sft_at_p1_20260730/v2r4-w190-step8000/d17a709df6debd483932e3e38214a91a1ec1f62814dd73dd6cad1f51a9b6070e",
+      "9920": "/results/v2r4_p2_sft_at_p1_20260730/v2r4-w190-step9920/d0c013bf51c17691ef9bdf5e5d65561912471ef949a161f80b4aa818da96c4fd"
+    },
+    "runtime_contract_sha256": "d9ade6a543168a152338b599fd8867aca34a3e807e2fd0f831fecb21385e5896",
+    "schema": "interleaved-v2r4-p2-sft-preflight-v1",
+    "selection_hash": "99d20a1ee7dad9ab88ab5de2dfe0df50cc9d9e076636cf41252fbb1db2ea371e",
+    "source_files": {
+      "pure_contract": "d2130127ac50fc35644472263f22207f71a14796c6281669427814bdb57a9bf3",
+      "runner": "61701998173d3ac19aa29a350c26d2a84f0d080592fb27cbe24fb4c0e9ef5493"
+    },
+    "state": "complete"
+  },
+  "preflight_function_call_id": "fc-01KYT0D03X12RDRSHWNFTZWCPN",
+  "runtime_contract_sha256": "d9ade6a543168a152338b599fd8867aca34a3e807e2fd0f831fecb21385e5896",
+  "schema": "interleaved-v2r4-p2-sft-launch-ledger-v1",
+  "state": "launched_all"
+}

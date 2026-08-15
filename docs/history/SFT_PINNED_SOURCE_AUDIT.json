@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "audited_at": "2026-07-30T02:50:00-04:00",
+  "repository": "chess-pre-to-post/sft_v1_200m_90k",
+  "revision": "97f60746dd253b4e130beeb5e66f39e9d42ef25c",
+  "json_files": 180,
+  "bytes": 8416392280,
+  "flat_name_size_sha256": "80f917f59d9f51b8fd14e8d4335c37e917a67c1990626656bbe106a7236f018e",
+  "nominal_rows_from_name": 90000,
+  "actual_results_rows": 77717,
+  "full_500_row_shards": 23,
+  "partial_shards": 157,
+  "minimum_shard_rows": 168,
+  "validation": {
+    "tokenizer": "LanTokenizerSFT",
+    "sequence_length": 3072,
+    "cot_field": "cot_by_method.trajectory_sep.cot_format_no_labels",
+    "valid_rows": 77717,
+    "invalid_rows": 0,
+    "overlength_rows": 0,
+    "no_target_rows": 0
+  },
+  "aligned_positions": {
+    "minimum": 119,
+    "mean": 945.3345,
+    "p50": 948,
+    "p95": 1434,
+    "p99": 1586,
+    "maximum": 1965
+  },
+  "supervised_positions": {
+    "minimum": 29,
+    "mean": 750.8027,
+    "p50": 764,
+    "p95": 1228,
+    "p99": 1367,
+    "maximum": 1703,
+    "total": 58350135
+  },
+  "conclusion": "Use every one of the 77,717 physically present rows. The 12,283-row discrepancy is in the pinned source snapshot, not downstream filtering."
+}

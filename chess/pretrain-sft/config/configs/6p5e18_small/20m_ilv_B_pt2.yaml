@@ -1,0 +1,65 @@
+# Interleave experiment, Arm B (interleaved), pretrain leg 2.
+# Init: Arm B leg-1 RL endpoint — miles GRPO 2500 steps from SFT(alpha1.000@step_60480),
+# converted to HF and staged at the path below (see chess-rl-miles conversion).
+# The RL checkpoint has vocab 85 (SFT added <T>,</T>,<sep>,<call_env> at ids 81-84);
+# the pretrain LanTokenizer has 81. resize_token_embeddings truncates to the base 81
+# rows (verified identical ids 0-80); reinit_embeddings MUST stay false or all
+# embeddings get re-randomized. SFT #2 re-adds the 4 specials afterwards, mirroring
+# how every SFT in the sweep extends a vocab-81 pretrain checkpoint.
+# Data/schedule identical to Arm C leg 2 (20m_ilv_C_pt2.yaml): skip_shards=27,822,
+# 21,139,816,448 tokens = 40,321 steps; only the init weights differ (RL'd vs not).
+
+model:
+  architecture: "Qwen/Qwen3-0.6B"
+  pretrained_model: "/checkpoints/6p5e18/interleave_inits/ilv_B_rl2500_hf"
+  init_from_scratch: false
+  reinit_embeddings: false
+  load_dtype: "float32"
+  block_size: 1024
+  n_layer: 6
+  n_head: 4
+  num_key_value_heads: 4
+  head_dim: 128
+  n_embed: 512
+  intermediate_size: 1536
+  dropout: 0.0
+
+training:
+  device: "cuda"
+  batch_size: 32
+  gradient_accumulation_steps: 2
+  epochs: 1
+  experiment_name: "20m_C_6p5e18_ilv_B_pt2"
+  optimizer:
+    name: adamw
+    lr: 1e-3
+    weight_decay: 0.1
+    betas: [0.9, 0.95]
+  scheduler:
+    name: cosine
+    eta_min: 1e-4
+    warmup_ratio: 0.05
+  max_grad_norm: 1.0
+  log_interval: 10
+  num_workers: 8
+  save_dir: "checkpoints"
+
+data:
+  txt_path: "/data/pretrain_v1_20b"
+  pretrain_tokens: 21139816448
+  eval_holdout: 2
+  skip_shards: 27822
+
+tokenizer:
+  name: "LanTokenizer"
+  special_tokens: ["<bos>", "<eos>", "<pad>"]
+  include_move_numbers: false
+
+logging:
+  backend: "wandb"
+  entity: "jingyanshen-new-york-university"
+  project: "chess-scaling-C_6p5e18"
+  notes: "Interleave Arm B: step_60480 -> SFT -> RL2500 -> +0.4C pretrain (this run)"
+  tags: ["C_6p5e18", "20m", "interleave", "arm_B", "pt2"]
+  mode: "online"
+  hf_upload_repo: "chess-pre-to-post/20m_C_6p5e18_ilv_B_pt2"

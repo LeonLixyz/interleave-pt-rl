@@ -1,0 +1,8 @@
+Metadata-Version: 2.4
+Name: chess-rl-miles
+Version: 0.1.0
+Summary: Chess-RL rollout and reward adapters for Miles.
+Requires-Python: >=3.11
+Requires-Dist: chess>=1.11.0
+Requires-Dist: huggingface_hub>=0.30.0
+Requires-Dist: pyarrow>=15.0.0

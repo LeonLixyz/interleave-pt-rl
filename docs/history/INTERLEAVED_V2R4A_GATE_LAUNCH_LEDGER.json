@@ -1,0 +1,67 @@
+{
+  "calls": [
+    {
+      "batch_label": "A",
+      "candidate_step": 6000,
+      "function_call_id": "fc-01KYT22WT1N54KQFW2HZCR569J",
+      "run_name": "v2r4a-gate-w190-s6000-batch-a"
+    },
+    {
+      "batch_label": "B",
+      "candidate_step": 6000,
+      "function_call_id": "fc-01KYT22WZ5FMA8PXX82207G4H0",
+      "run_name": "v2r4a-gate-w190-s6000-batch-b"
+    },
+    {
+      "batch_label": "A",
+      "candidate_step": 8000,
+      "function_call_id": "fc-01KYT22X3A7EG7R6Y83VZ9CBXD",
+      "run_name": "v2r4a-gate-w190-s8000-batch-a"
+    },
+    {
+      "batch_label": "B",
+      "candidate_step": 8000,
+      "function_call_id": "fc-01KYT22X68F8KZXV3ENBP8HY17",
+      "run_name": "v2r4a-gate-w190-s8000-batch-b"
+    },
+    {
+      "batch_label": "A",
+      "candidate_step": 9920,
+      "function_call_id": "fc-01KYT22X9KH07VFZGMTR2PMCK7",
+      "run_name": "v2r4a-gate-w190-s9920-batch-a"
+    },
+    {
+      "batch_label": "B",
+      "candidate_step": 9920,
+      "function_call_id": "fc-01KYT22XCSR7MEPWA5HERQNKPV",
+      "run_name": "v2r4a-gate-w190-s9920-batch-b"
+    }
+  ],
+  "contract_sha256": "3e201cfd9094815cf72a63058d4225b334e3e5cd77fc0d79fbe6379d48778c9d",
+  "expected_call_count": 6,
+  "ledger_sha256": "a09a1a10a651417b3b91294d757a03ce1236e9ede170ad32ff3f2bb193f2f648",
+  "preflight": {
+    "all_six_canonical_roots_absent": true,
+    "contract_file_sha256": "04945f691aa55e3aaa860851b33b49aba9eea789533e5f86f3e0d2345bbc1c38",
+    "contract_sha256": "3e201cfd9094815cf72a63058d4225b334e3e5cd77fc0d79fbe6379d48778c9d",
+    "ray_worker_environment": {
+      "artifact_root": "/rl-checkpoints/chess-rl-miles-interleave/v2r4a-ray-env-preflight",
+      "gpu_allocated": false,
+      "seed_mode": "sample-index"
+    },
+    "run_roots": [
+      "/rl-checkpoints/chess-rl-miles-interleave/v2r4a-gate-w190-s6000-batch-a",
+      "/rl-checkpoints/chess-rl-miles-interleave/v2r4a-gate-w190-s6000-batch-b",
+      "/rl-checkpoints/chess-rl-miles-interleave/v2r4a-gate-w190-s8000-batch-a",
+      "/rl-checkpoints/chess-rl-miles-interleave/v2r4a-gate-w190-s8000-batch-b",
+      "/rl-checkpoints/chess-rl-miles-interleave/v2r4a-gate-w190-s9920-batch-a",
+      "/rl-checkpoints/chess-rl-miles-interleave/v2r4a-gate-w190-s9920-batch-b"
+    ],
+    "schema": "interleaved-v2r4-gate-preflight-v1",
+    "version": "v2r4a_production_gate_20260730"
+  },
+  "preflight_call_id": "fc-01KYT226WWJ4MWEDDCF8F1DGD3",
+  "schema": "interleaved-v2r4-gate-launch-ledger-v1",
+  "state": "launched_all",
+  "version": "v2r4a_production_gate_20260730"
+}

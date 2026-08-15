@@ -1,0 +1,52 @@
+{
+  "schema": "interleaved-20b-launch-ledger-v1",
+  "experiment_version": "mix20b_sft77k_once_3072_v1_20260730",
+  "data_artifact_version": "mix20b_sft77k_once_clean_v1_20260730",
+  "status": "initial_training_running",
+  "authorized_at": "2026-07-30T22:18:00-04:00",
+  "contract_sha256": "24d1422696f349a94fa9074b334d2105470973a9675728f7ec0ea5cb714f77f5",
+  "source_tree_sha256": "aa8671604fa93095b31499f19f2834d87e3c9f29f76857c8e354255c823d5aee",
+  "launcher": "chess_reasoning/modal_scripts/launch_50m_interleaved_20b.py",
+  "artifact_root": "/data/50m_interleaved_mix20b_sft77k_once_clean_v1_20260730",
+  "checkpoint_root": "/checkpoints/interleave_50m/pretrain/mix20b_sft77k_once_3072_v1_20260730",
+  "calls": {
+    "data_prep": {
+      "app_id": "ap-UzPNiv08XXZ8LtrziCac9l",
+      "function_call_id": "fc-01KYTZTAT9DGXMT3CWD3CZBDM8",
+      "submitted_at": "2026-07-30T22:25:05-04:00",
+      "status": "success",
+      "result": "/data/50m_interleaved_mix20b_sft77k_once_clean_v1_20260730/manifest_set.json"
+    },
+    "canary": {
+      "app_id": "ap-Hg4QixpUTJIl0GKzH3MPyv",
+      "function_call_id": "fc-01KYV07313JKHFE2D32TGQ1NHT",
+      "submitted_at": "2026-07-30T22:32:03-04:00",
+      "status": "success",
+      "result": "/checkpoints/interleave_50m/pretrain/mix20b_sft77k_once_3072_v1_20260730/canary/mixed-step1-source-v2"
+    },
+    "p1": {
+      "description": "10B midpoint training with first SFT half",
+      "app_id": "ap-fQYdJDkWQThko6H38UG3ZY",
+      "function_call_id": "fc-01KYV08S9VA69W4HCP5Z8HM48N",
+      "submitted_at": "2026-07-30T22:32:59-04:00",
+      "status": "running",
+      "target_steps": 19608
+    },
+    "exp2": {
+      "description": "20B continuous one-cosine training with all SFT",
+      "app_id": "ap-fQYdJDkWQThko6H38UG3ZY",
+      "function_call_id": "fc-01KYV08SBTZ1E8BCW5TV8XYS7B",
+      "submitted_at": "2026-07-30T22:32:59-04:00",
+      "status": "running",
+      "target_steps": 39216
+    }
+  },
+  "artifacts": {
+    "manifest_set_hash": "607c8a052dce1026992c23424a6d61b47885038e0899b8da58179c92e5bb4e53",
+    "canary_gate_sha256": "12e12dd2d60e0f85c57836e2667b7485bb2db47dd2fce92a0a2c47157ba055dd"
+  },
+  "notes": [
+    "Separate from the immutable 10B experiment and its active autopilot.",
+    "P1 and E2 launch concurrently only after data validation and the mixed canary pass."
+  ]
+}

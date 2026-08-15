@@ -1,0 +1,62 @@
+{
+  "created_at": "2026-08-15T02:12:00+00:00",
+  "finished_at": "2026-08-15T02:20:45+00:00",
+  "ledger_sha256": "9704d0bb119073cc38ead2bc4ba7144877d6148102676a91cb29bbb226dfbe26",
+  "rl_calls": [
+    {
+      "checkpoint": "vocab81_then_sft3",
+      "filtered_parquet": {
+        "bytes": 27334080,
+        "path": "/data/chess-rl-data/train_v4_ctx2048_fp32masterv13_all4_intersection_mixed_outcome_1to15of16_multi_turn.parquet",
+        "rows": 28419,
+        "sha256": "024d423c1438a1bfc0ed24898732a842dc13542082e3ecefdb62f4d0f43cbcbc"
+      },
+      "function_call_id": "fc-01M01K1CWNPKJ0B19RQFKN22V8",
+      "run_name": "ctx2048-fp32masterv13-vocab81pt-expand85-sft3-filtered-lr1e5-rl1500-r3",
+      "wandb_group": "all-four-context2048-checkpoints-filtered-lr1e5",
+      "wandb_project": "chess-47m-context2048-rl"
+    },
+    {
+      "checkpoint": "vocab85_then_sft3",
+      "filtered_parquet": {
+        "bytes": 27334080,
+        "path": "/data/chess-rl-data/train_v4_ctx2048_fp32masterv13_all4_intersection_mixed_outcome_1to15of16_multi_turn.parquet",
+        "rows": 28419,
+        "sha256": "024d423c1438a1bfc0ed24898732a842dc13542082e3ecefdb62f4d0f43cbcbc"
+      },
+      "function_call_id": "fc-01M01K62C872VZZN6983QJG63Z",
+      "run_name": "ctx2048-fp32masterv13-vocab85pt-sft3-filtered-lr1e5-rl1500-r3",
+      "wandb_group": "all-four-context2048-checkpoints-filtered-lr1e5",
+      "wandb_project": "chess-47m-context2048-rl"
+    },
+    {
+      "checkpoint": "mixed_sft1",
+      "filtered_parquet": {
+        "bytes": 27334080,
+        "path": "/data/chess-rl-data/train_v4_ctx2048_fp32masterv13_all4_intersection_mixed_outcome_1to15of16_multi_turn.parquet",
+        "rows": 28419,
+        "sha256": "024d423c1438a1bfc0ed24898732a842dc13542082e3ecefdb62f4d0f43cbcbc"
+      },
+      "function_call_id": "fc-01M01KA3QTD63NT41W52BEAD30",
+      "run_name": "ctx2048-fp32masterv13-mixed-sft1-filtered-lr1e5-rl1500-r3",
+      "wandb_group": "all-four-context2048-checkpoints-filtered-lr1e5",
+      "wandb_project": "chess-47m-context2048-rl"
+    },
+    {
+      "checkpoint": "mixed_sft3",
+      "filtered_parquet": {
+        "bytes": 27334080,
+        "path": "/data/chess-rl-data/train_v4_ctx2048_fp32masterv13_all4_intersection_mixed_outcome_1to15of16_multi_turn.parquet",
+        "rows": 28419,
+        "sha256": "024d423c1438a1bfc0ed24898732a842dc13542082e3ecefdb62f4d0f43cbcbc"
+      },
+      "function_call_id": "fc-01M01KE7VVVQG0HEB95X0Z47X7",
+      "run_name": "ctx2048-fp32masterv13-mixed-sft3-filtered-lr1e5-rl1500-r3",
+      "wandb_group": "all-four-context2048-checkpoints-filtered-lr1e5",
+      "wandb_project": "chess-47m-context2048-rl"
+    }
+  ],
+  "schema": "context2048-remaining-rl-launch-v1",
+  "state": "launched",
+  "version": "context2048-fp32-master-v13-pass16-native2048-bos-v1-20260814"
+}

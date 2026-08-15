@@ -1,0 +1,74 @@
+# Controlled ~20M Llama-3.1 architecture comparison at C_total=6.5e18.
+# Parameter count with the 81-token LanTokenizer vocabulary: 20,495,360.
+# The tied embedding choice keeps the budget within 0.0075% of the Qwen3
+# baseline and matches Llama 3.2; the attention/MLP/RoPE geometry is scaled
+# from Meta-Llama-3.1-8B.
+
+model:
+  architecture: "meta-llama/Meta-Llama-3.1-8B"
+  model_family: "llama"
+  block_size: 1024
+  max_position_embeddings: 131072
+  n_layer: 6
+  n_head: 4
+  num_key_value_heads: 1
+  head_dim: 128
+  n_embed: 512
+  intermediate_size: 1792
+  hidden_act: "silu"
+  rms_norm_eps: 1e-5
+  rope_theta: 500000.0
+  rope_scaling:
+    rope_type: "llama3"
+    factor: 8.0
+    low_freq_factor: 1.0
+    high_freq_factor: 4.0
+    original_max_position_embeddings: 8192
+  attention_bias: false
+  mlp_bias: false
+  tie_word_embeddings: true
+  dropout: 0.0
+
+training:
+  device: "cuda"
+  batch_size: 32
+  gradient_accumulation_steps: 2
+  epochs: 1
+  experiment_name: "20m_llama31_C_6p5e18_alpha0.050"
+  run_name: "20m_llama31_C_6p5e18_alpha0.050"
+  optimizer:
+    name: "adamw"
+    lr: 1e-3
+    weight_decay: 0.1
+    betas: [0.9, 0.95]
+  scheduler:
+    name: "cosine"
+    eta_min: 1e-4
+    warmup_ratio: 0.05
+  max_grad_norm: 1.0
+  log_interval: 10
+  num_workers: 8
+  seed: 42
+  mixed_precision: "bf16"
+  gpu_peak_tflops: 989
+  cache_size: 0
+  save_dir: "checkpoints/6p5e18_llama31"
+  hf_upload_repo: "Pre-to-Post-2/pretrain_20m_llama31_C_6p5e18_alpha0.050"
+
+data:
+  txt_path: "/data/pretrain_v1_20b"
+  pretrain_tokens: 2641541000
+  eval_holdout: 2
+
+tokenizer:
+  name: "LanTokenizer"
+  special_tokens: ["<bos>", "<eos>", "<pad>"]
+  include_move_numbers: false
+
+logging:
+  backend: "wandb"
+  entity: "jingyanshen-new-york-university"
+  project: "chess-scaling-C_6p5e18-llama31"
+  notes: "Llama-3.1 controlled architecture, C=6.5e18 alpha=0.050 ~20m"
+  tags: ["C_6p5e18", "alpha0.050", "20m", "llama31", "architecture_control"]
+  mode: "online"

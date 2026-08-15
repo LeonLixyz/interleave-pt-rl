@@ -1,0 +1,18 @@
+{
+  "schema": "interleaved-v2r4d-import-probe-report-v1",
+  "app_id": "ap-DFsqe6twFQbMsqEK1FlHQR",
+  "app_url": "https://modal.com/apps/modal-labs/leon-dev/ap-DFsqe6twFQbMsqEK1FlHQR",
+  "observed_at": "2026-07-30T16:25:07-04:00",
+  "result": {
+    "schema": "interleaved-v2r4d-import-probe-v1",
+    "version": "v2r4d_production_gate_20260730",
+    "launcher_path": "/root/modal_v2r4d_gate.py",
+    "launcher_sha256": "1bdcb15aeef7c0e1419df0b5393ab369850000976e1e81d82800272e18428419",
+    "project_path": "/root/chess-rl-miles",
+    "package_path": "/root/chess-rl-miles/chess_rl_miles/scripts/modal_interleave.py",
+    "project_on_sys_path": true,
+    "volumes_mounted": false,
+    "gpu_requested": false
+  },
+  "report_sha256": "2994a5660f8cb08dedcb128c1bc5d4638114142ecd4d0534a219daea7c74ee84"
+}

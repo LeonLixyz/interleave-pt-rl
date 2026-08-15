@@ -1,0 +1,5 @@
+chess_multiturn: true
+chess_reward_model_type: RULE_BASED
+chess_difficulty_threshold: 1500.0
+chess_max_env_calls: 6
+chess_call_env_token: "<call_env>"

@@ -1,0 +1,17 @@
+[project]
+name = "math-pretraining"
+version = "0.0.1"
+description = "Single-pass math LLM pretraining on Nemotron-CC-Math-v1 with per-checkpoint annealing"
+requires-python = ">=3.11"
+dependencies = [
+    "modal>=1.4",
+    "huggingface_hub>=0.26",
+    "hf_transfer>=0.1.8",
+    "tokenizers>=0.20",
+    "pyarrow>=16",
+    "numpy>=1.26",
+    "tqdm>=4.66",
+]
+
+[tool.uv]
+package = false

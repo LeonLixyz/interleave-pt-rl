@@ -1,0 +1,19 @@
+{
+  "calls": [
+    {
+      "function_call_id": "fc-01M01C4H7Y1XN2W64NSJCJ19MK",
+      "leg": 1
+    },
+    {
+      "function_call_id": "fc-01M01CSZHCQJCDFSGFYJRRZCFJ",
+      "leg": 2
+    }
+  ],
+  "contract_sha256": "c136bf87682477176877a0e2a30ac80e337355a31d0e3c5359a68cbd5723088d",
+  "expected_training_call_count": 2,
+  "finalizer_call_id": "fc-01M01DAZ8H9M0MMDFM2FX992ZH",
+  "ledger_sha256": "4dd03942753ad17b708eeb82a967c12efe4ecef86a62cdace419eca2f20a69c2",
+  "passed_path": "/rl-checkpoints/chess-rl-miles-interleave-fp32-master-v3/_precision_resume_gates/c136bf87682477176877a0e2a30ac80e337355a31d0e3c5359a68cbd5723088d/PASSED.json",
+  "schema": "chess-rl-miles-precision-gate-launch-ledger-v1",
+  "state": "passed"
+}

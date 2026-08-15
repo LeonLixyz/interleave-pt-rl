@@ -1,0 +1,24 @@
+{
+  "anchor": "step95368",
+  "rl_step": 500,
+  "per_dataset": {
+    "gsm8k": {
+      "n_prompts": 1319,
+      "n_samples": 4,
+      "pass_at_1_avg": 0.5181956027293404,
+      "pass_at_n": 0.7202426080363912
+    },
+    "math500": {
+      "n_prompts": 500,
+      "n_samples": 4,
+      "pass_at_1_avg": 0.3055,
+      "pass_at_n": 0.478
+    },
+    "skyeasy25k_eval": {
+      "n_prompts": 500,
+      "n_samples": 4,
+      "pass_at_1_avg": 0.327,
+      "pass_at_n": 0.48
+    }
+  }
+}

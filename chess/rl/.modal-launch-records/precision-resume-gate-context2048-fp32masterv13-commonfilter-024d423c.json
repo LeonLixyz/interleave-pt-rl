@@ -1,0 +1,13 @@
+{
+  "calls": [
+    {
+      "function_call_id": "fc-01M00P3NJE4NR2TTAC2JC933R8",
+      "leg": 1
+    }
+  ],
+  "error": "RuntimeError: production RL requires regular vocab.json, tokenizer.json, and tokenizer_config.json",
+  "expected_training_call_count": 2,
+  "ledger_sha256": "6a5e98a3e41a3108db0224e2afb603bc0e4c17ab665b223a90a853ebe550d22c",
+  "schema": "chess-rl-miles-precision-gate-launch-ledger-v1",
+  "state": "failed"
+}

@@ -1,0 +1,64 @@
+# ======================
+# Model Configuration
+# ======================
+model:
+  block_size: 2048
+  n_layer: 24
+  n_head: 16
+  n_embed: 1024
+  dropout: 0.1
+  mlp_type: "gelu"
+
+# ======================
+# Training Configuration
+# ======================
+training:
+  device: "cuda"
+  batch_size: 4
+  learning_rate: 1e-3
+  gradient_accumulation_steps: 16
+  epochs: 1
+  optimizer:
+    name: adamw
+    lr: 1e-3
+    weight_decay: 0.1
+    betas: [0.9, 0.95]
+  scheduler:
+    name: cosine
+    eta_min: 1e-5
+    warmup_steps: 1000
+  log_interval: 120
+  save_interval: 1000
+  num_workers: 8
+  save_dir: "../../checkpoints/chess_gpt2_8B_tokens_grad_accum_8_1_epoch"
+
+# ======================
+# Data Configuration
+# ======================
+data:
+  txt_path: "/scratch/js15262/LLM-Pretraining/data/chess/train/tokenized"
+  num_shards: 7025
+  # or:
+  # txt_files: ["data/chess/_shards/ctx.0000.txt", "data/chess/_shards/ctx.0001.txt"]
+  # eval_txt_files: ["data/chess/_shards/ctx.0000.txt", "data/chess/_shards/ctx.0001.txt"]
+  eval_holdout: 2
+
+# ======================
+# Tokenizer Configuration
+# ======================
+tokenizer:
+  name: "LanTokenizer"
+  special_tokens: ["<bos>", "<eos>", "<pad>"]
+  include_move_numbers: false
+  # optional for BPE:
+  # bpe_dir: "tokenizer_bpe"
+
+# ======================
+# Logging Configuration
+# ======================
+logging:
+  backend: "wandb"
+  project: "chess-pretrain-gpt2-medium-8B"
+  notes: "Pretraining on chess dataset with GPT-2"
+  mode: "online"
+  # tags: ["pretrain", "gpt2", "chess"]

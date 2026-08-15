@@ -1,0 +1,27 @@
+{
+  "checkpoint": "/checkpoints/math-1b-v0/step40000",
+  "eval_ratio": 0.15,
+  "eval_split_seed": 20260626,
+  "results": {
+    "dolma3": {
+      "elapsed_s": 240.79080390930176,
+      "loss": 1.7145808715831146,
+      "n_tokens": 199836000,
+      "ppl": 5.554347039749383
+    },
+    "mixture": {
+      "elapsed_s": 263.7201418876648,
+      "loss": 1.258251699260938,
+      "n_tokens": 199836000,
+      "ppl": 3.519263375058216
+    },
+    "per_source": {}
+  },
+  "step": 40000,
+  "tokens_evaluated": 399672000,
+  "untrained_weights": {
+    "dolma3": 0.37974683544303794,
+    "math_3": 0.26582278481012656,
+    "math_4plus_MIND": 0.35443037974683544
+  }
+}

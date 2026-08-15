@@ -1,0 +1,10 @@
+{
+  "calls": [],
+  "contract_sha256": "d80e77b2e80149342983a5d37ed90cc3c2b74e058c51a108a950435171198940",
+  "error": "RemoteError: Function call was cancelled by user.",
+  "ledger_sha256": "0d919f6bb083a89bd34c75867d56edcf8da96b1241dac636a606c8bd42feffc6",
+  "preflight_call_id": "fc-01KYT9E8019J10C6FST75VNVP8",
+  "schema": "interleaved-v2r4c-canary-launch-ledger-v1",
+  "state": "preflight_failed",
+  "version": "v2r4c_production_gate_20260730"
+}

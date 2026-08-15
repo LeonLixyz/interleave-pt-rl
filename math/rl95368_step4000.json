@@ -1,0 +1,18 @@
+{
+  "anchor": "step95368",
+  "rl_step": 4000,
+  "per_dataset": {
+    "gsm8k": {
+      "n_prompts": 1319,
+      "n_samples": 4,
+      "pass_at_1_avg": 0.6249052312357847,
+      "pass_at_n": 0.7573919636087946
+    },
+    "math500": {
+      "n_prompts": 500,
+      "n_samples": 4,
+      "pass_at_1_avg": 0.367,
+      "pass_at_n": 0.492
+    }
+  }
+}

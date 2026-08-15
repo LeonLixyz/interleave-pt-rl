@@ -1,0 +1,28 @@
+{
+  "calls": [
+    {
+      "function_call_id": "fc-01M016PB0DJ3F6YNNG6QHWD62M",
+      "leg": 1
+    },
+    {
+      "function_call_id": "fc-01M01AYP7Q2M5CHNZR1R5GVHF0",
+      "leg": 2
+    }
+  ],
+  "contract_sha256": "0f78ee849d835b2311b6bb7bd7db4ed9831101f009ea5cd60dd01d3aed9c0655",
+  "expected_training_call_count": 2,
+  "finalizer_call_id": "fc-01M01BHDNYTFC5VX50KWQAWHEV",
+  "ledger_sha256": "3feec61d4e8ae54d0a58a25bdec578e77c914d4e9d3bf905229e1a25bfc3a01f",
+  "passed_path": "/rl-checkpoints/chess-rl-miles-interleave-fp32-master-v3/_precision_resume_gates/0f78ee849d835b2311b6bb7bd7db4ed9831101f009ea5cd60dd01d3aed9c0655/PASSED.json",
+  "prior_orchestrator_error": "ConnectionError: [Errno 8] nodename nor servname provided, or not known",
+  "rejected_calls": [
+    {
+      "function_call_id": "fc-01M01ATXP132VNG4J61QEYJD9Y",
+      "requested_leg": 2,
+      "terminal_error": "precision gate contract changed between independent FunctionCalls",
+      "training_started": false
+    }
+  ],
+  "schema": "chess-rl-miles-precision-gate-launch-ledger-v1",
+  "state": "passed"
+}

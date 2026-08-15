@@ -1,0 +1,132 @@
+{
+  "calls": [
+    {
+      "function_call_id": "fc-01KYTCM2GXV76NVMW58PX869DA",
+      "run_name": "v2r4d-runtime-canary-s6000-seed13477620"
+    }
+  ],
+  "contract_sha256": "e580dc8b806df0788f06a6daf48e2b288a858264d8cd6b2c26484e29a3e1af9f",
+  "error": "FileExistsError: /rl-checkpoints/chess-rl-miles-interleave/v2r4d-runtime-canary-s6000-seed13477620",
+  "ledger_sha256": "b453936f5e646d18ceb8bb95b6b69ab0f978c93e2c12c8bc970aef03632b0755",
+  "preflight": {
+    "canary_state": "absent",
+    "canary_success_sha256": null,
+    "contract_file_sha256": "8f3c30afaef27263346392775b271a67dc3c0de84e6d9d73aaed18524129ea19",
+    "contract_sha256": "e580dc8b806df0788f06a6daf48e2b288a858264d8cd6b2c26484e29a3e1af9f",
+    "fresh_prompt_intersections_authenticated": true,
+    "grid_roots": [
+      "/rl-checkpoints/chess-rl-miles-interleave/v2r4d-gate-w190-s6000-batch-a",
+      "/rl-checkpoints/chess-rl-miles-interleave/v2r4d-gate-w190-s6000-batch-b",
+      "/rl-checkpoints/chess-rl-miles-interleave/v2r4d-gate-w190-s8000-batch-a",
+      "/rl-checkpoints/chess-rl-miles-interleave/v2r4d-gate-w190-s8000-batch-b",
+      "/rl-checkpoints/chess-rl-miles-interleave/v2r4d-gate-w190-s9920-batch-a",
+      "/rl-checkpoints/chess-rl-miles-interleave/v2r4d-gate-w190-s9920-batch-b"
+    ],
+    "grid_roots_absent": true,
+    "import_probe_report_sha256": "2994a5660f8cb08dedcb128c1bc5d4638114142ecd4d0534a219daea7c74ee84",
+    "phase": "canary",
+    "predecessor_incident_sha256": "2a2eaeb867d73366b69377e6f965a925eff0c3db8bd8bae881ec4d035e3ec5f0",
+    "predecessor_result_count": 0,
+    "predecessor_results_absent": true,
+    "predecessor_root_count": 7,
+    "predecessor_roots_absent": true,
+    "prompt_manifest_sha256": "83f4718b829b955cb000908c2ecbb9052883d14404114cbca4ecd42988659056",
+    "quarantine": {
+      "authorization_absent": true,
+      "entire_grid_quarantined": true,
+      "grid": [
+        {
+          "batch_label": "A",
+          "candidate_step": 6000,
+          "function_call_id": "fc-01KYT22WT1N54KQFW2HZCR569J",
+          "root_file_count": 16,
+          "root_identity_authenticated": true,
+          "root_inventory_sha256": "af1fd5e5907cf341d6668dbf99336a7475e4d5c7db3867b436633f796ce0d09e",
+          "root_total_bytes": 50471241,
+          "run_name": "v2r4a-gate-w190-s6000-batch-a",
+          "success_marker_present": true,
+          "success_marker_sha256": "d2a23a3dea80a02f4156ddf10ae18b8c6bf0965552fb86aad5e8a52618f2763f",
+          "terminal_state": "success_quarantined_blinding_violation"
+        },
+        {
+          "batch_label": "B",
+          "candidate_step": 6000,
+          "function_call_id": "fc-01KYT22WZ5FMA8PXX82207G4H0",
+          "root_file_count": 3,
+          "root_identity_authenticated": true,
+          "root_inventory_sha256": "5df25ddfa827f18b80f928d40792cf13dd4cf3797ee630e99d8196bcb6c0745d",
+          "root_total_bytes": 24265,
+          "run_name": "v2r4a-gate-w190-s6000-batch-b",
+          "success_marker_present": false,
+          "success_marker_sha256": null,
+          "terminal_state": "watchdog_failure"
+        },
+        {
+          "batch_label": "A",
+          "candidate_step": 8000,
+          "function_call_id": "fc-01KYT22X3A7EG7R6Y83VZ9CBXD",
+          "root_file_count": 3,
+          "root_identity_authenticated": true,
+          "root_inventory_sha256": "c9ad5a8708c7c939ee1769dabfcc622875847db325dfdeff0517a846dcaf62b5",
+          "root_total_bytes": 24268,
+          "run_name": "v2r4a-gate-w190-s8000-batch-a",
+          "success_marker_present": false,
+          "success_marker_sha256": null,
+          "terminal_state": "watchdog_failure"
+        },
+        {
+          "batch_label": "B",
+          "candidate_step": 8000,
+          "function_call_id": "fc-01KYT22X68F8KZXV3ENBP8HY17",
+          "root_file_count": 16,
+          "root_identity_authenticated": true,
+          "root_inventory_sha256": "53fafd561cbcfa4766e6b50a4b3758f2a0b0e99a49f85d22fbb3c63e3a7f926d",
+          "root_total_bytes": 49033603,
+          "run_name": "v2r4a-gate-w190-s8000-batch-b",
+          "success_marker_present": true,
+          "success_marker_sha256": "60cd0896b98f4c34a1d09964b3a52fb1dbb067326498a31c8ef74ee0173cb223",
+          "terminal_state": "success_quarantined_blinding_violation"
+        },
+        {
+          "batch_label": "A",
+          "candidate_step": 9920,
+          "function_call_id": "fc-01KYT22X9KH07VFZGMTR2PMCK7",
+          "root_file_count": 3,
+          "root_identity_authenticated": true,
+          "root_inventory_sha256": "c30916fe235af0178a0b93af08d593a620bda9da728c600a4e2b7f7c88c1d4bc",
+          "root_total_bytes": 24267,
+          "run_name": "v2r4a-gate-w190-s9920-batch-a",
+          "success_marker_present": false,
+          "success_marker_sha256": null,
+          "terminal_state": "watchdog_failure"
+        },
+        {
+          "batch_label": "B",
+          "candidate_step": 9920,
+          "function_call_id": "fc-01KYT22XCSR7MEPWA5HERQNKPV",
+          "root_file_count": 16,
+          "root_identity_authenticated": true,
+          "root_inventory_sha256": "b2c76bf69fb471cdf559257751574f1c56ae88c511d20d0ca221738752a064be",
+          "root_total_bytes": 48703637,
+          "run_name": "v2r4a-gate-w190-s9920-batch-b",
+          "success_marker_present": true,
+          "success_marker_sha256": "4ab96a40647a80319aa0369dede1c70ce2cdcf212ce4fbf2ca99ab3ccee7a60f",
+          "terminal_state": "success_quarantined_blinding_violation"
+        }
+      ],
+      "report_file_sha256": "b800d3f8289cf1e4d2ef1320efb4185ab62761c576f3dd05b863d11c8d694970",
+      "report_sha256": "576bf2fb346666f8b9da2d3df5563d9e29e65b60ce1a66c07b74bf6318428947"
+    },
+    "ray_worker_environment": {
+      "artifact_root": "/rl-checkpoints/chess-rl-miles-interleave/v2r4d-ray-env-preflight",
+      "gpu_allocated": false,
+      "seed_mode": "sample-index"
+    },
+    "schema": "interleaved-v2r4d-gate-preflight-v1",
+    "version": "v2r4d_production_gate_20260730"
+  },
+  "preflight_call_id": "fc-01KYTCK54VW8VZ1ZGNWA0XY5AX",
+  "schema": "interleaved-v2r4d-canary-launch-ledger-v1",
+  "state": "canary_failed",
+  "version": "v2r4d_production_gate_20260730"
+}

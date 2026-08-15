@@ -1,0 +1,19 @@
+{
+  "calls": [
+    {
+      "function_call_id": "fc-01M00TRRAZN8KQ4W92WP60KA2E",
+      "leg": 1
+    },
+    {
+      "function_call_id": "fc-01M00W45M7S5E64TTQT6J976FR",
+      "leg": 2
+    }
+  ],
+  "contract_sha256": "6c385352e6abd7d5a3012179fe9945559bc919543ef516e15edd3eb11675e21f",
+  "error": "RuntimeError: W&B precision-gate evidence did not converge after 24 polls for jingyanshen-new-york-university/chess-47m-context2048-rl/prgate7d322ae7c61bc6de8dbc: RuntimeError: W&B requires one finite train event at step 1; found 0",
+  "expected_training_call_count": 2,
+  "finalizer_call_id": "fc-01M00X8YNQHFAYYGS7BR394APH",
+  "ledger_sha256": "fe217bfd2c4b788580ca18abd515c59d39244f04800b5d81976a7091c53d2ac9",
+  "schema": "chess-rl-miles-precision-gate-launch-ledger-v1",
+  "state": "failed"
+}

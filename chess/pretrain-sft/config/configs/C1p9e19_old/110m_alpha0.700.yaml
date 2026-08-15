@@ -1,0 +1,53 @@
+# C_total=1.9e19, alpha=0.700
+# Model: ~110M (111.3M params)
+# Architecture: n_layer=12, n_embed=768, n_head=12, kv_heads=8, head_dim=128, intermediate=2304
+# Pretrain tokens: 19,894,715,000 (17345 shards, 17343 train + 2 eval)
+# Estimated steps: ~607162
+
+model:
+  architecture: "Qwen/Qwen3-0.6B"
+  block_size: 1024
+  n_layer: 12
+  n_head: 12
+  num_key_value_heads: 8
+  head_dim: 128
+  n_embed: 768
+  intermediate_size: 2304
+  dropout: 0.0
+
+training:
+  device: "cuda"
+  batch_size: 32
+  gradient_accumulation_steps: 1
+  epochs: 1
+  experiment_name: "110m_C_1p9e19_alpha0.700"
+  optimizer:
+    name: adamw
+    lr: 1e-3
+    weight_decay: 0.1
+    betas: [0.9, 0.95]
+  scheduler:
+    name: cosine
+    eta_min: 1e-5
+    warmup_ratio: 0.05
+  max_grad_norm: 1.0
+  log_interval: 10
+  num_workers: 8
+  save_dir: "checkpoints"
+
+data:
+  txt_path: "/scratch/al6843/chess_reasoning/data/train/tokenized"
+  pretrain_tokens: 19894715000
+  eval_holdout: 2
+
+tokenizer:
+  name: "LanTokenizer"
+  special_tokens: ["<bos>", "<eos>", "<pad>"]
+  include_move_numbers: false
+
+logging:
+  backend: "wandb"
+  project: "chess-scaling-C_1p9e19"
+  notes: "C=1.9e19 alpha=0.700 110m"
+  tags: ["C_1p9e19", "alpha0.700", "110m"]
+  mode: "online"

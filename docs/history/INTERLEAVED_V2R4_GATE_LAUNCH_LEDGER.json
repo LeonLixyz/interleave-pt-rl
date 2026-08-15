@@ -1,0 +1,62 @@
+{
+  "calls": [
+    {
+      "batch_label": "A",
+      "candidate_step": 6000,
+      "function_call_id": "fc-01KYT16H4M5MRHCV3FNSHQ3WGQ",
+      "run_name": "v2r4-gate-w190-s6000-batch-a"
+    },
+    {
+      "batch_label": "B",
+      "candidate_step": 6000,
+      "function_call_id": "fc-01KYT16H9WPNCGJW90KT646ABA",
+      "run_name": "v2r4-gate-w190-s6000-batch-b"
+    },
+    {
+      "batch_label": "A",
+      "candidate_step": 8000,
+      "function_call_id": "fc-01KYT16HCD9WCV77NM08HFWMRK",
+      "run_name": "v2r4-gate-w190-s8000-batch-a"
+    },
+    {
+      "batch_label": "B",
+      "candidate_step": 8000,
+      "function_call_id": "fc-01KYT16HF1SC79V08FBJRRVXZ9",
+      "run_name": "v2r4-gate-w190-s8000-batch-b"
+    },
+    {
+      "batch_label": "A",
+      "candidate_step": 9920,
+      "function_call_id": "fc-01KYT16HH87GZRVQER47J4RPJR",
+      "run_name": "v2r4-gate-w190-s9920-batch-a"
+    },
+    {
+      "batch_label": "B",
+      "candidate_step": 9920,
+      "function_call_id": "fc-01KYT16HMCKPS13RT36RRC4VM7",
+      "run_name": "v2r4-gate-w190-s9920-batch-b"
+    }
+  ],
+  "contract_sha256": "3127bdd6dfca62b34813e3fe938300d5d44c8d7ac253bf4a65836f4b2fc1ffd3",
+  "expected_call_count": 6,
+  "ledger_sha256": "8367979ea65f37d5bcf921cda3c3bbf465e39cc15bf20107b23ea68d9d3b980b",
+  "preflight": {
+    "all_six_canonical_roots_absent": true,
+    "contract_file_sha256": "9bc355fb7ac89dda15cbf4d0c1a4767a3ac5e314e6c800c398f3e9062de02f29",
+    "contract_sha256": "3127bdd6dfca62b34813e3fe938300d5d44c8d7ac253bf4a65836f4b2fc1ffd3",
+    "run_roots": [
+      "/rl-checkpoints/chess-rl-miles-interleave/v2r4-gate-w190-s6000-batch-a",
+      "/rl-checkpoints/chess-rl-miles-interleave/v2r4-gate-w190-s6000-batch-b",
+      "/rl-checkpoints/chess-rl-miles-interleave/v2r4-gate-w190-s8000-batch-a",
+      "/rl-checkpoints/chess-rl-miles-interleave/v2r4-gate-w190-s8000-batch-b",
+      "/rl-checkpoints/chess-rl-miles-interleave/v2r4-gate-w190-s9920-batch-a",
+      "/rl-checkpoints/chess-rl-miles-interleave/v2r4-gate-w190-s9920-batch-b"
+    ],
+    "schema": "interleaved-v2r4-gate-preflight-v1",
+    "version": "v2r4_production_gate_20260730"
+  },
+  "preflight_call_id": "fc-01KYT166R7ED5NBPFAZ5W4VZ3B",
+  "schema": "interleaved-v2r4-gate-launch-ledger-v1",
+  "state": "launched_all",
+  "version": "v2r4_production_gate_20260730"
+}

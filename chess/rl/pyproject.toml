@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "chess-rl-miles"
+version = "0.1.0"
+description = "Chess-RL rollout and reward adapters for Miles."
+requires-python = ">=3.11"
+dependencies = [
+  "chess>=1.11.0",
+  "huggingface_hub>=0.30.0",
+  "pyarrow>=15.0.0",
+]
+
+[tool.setuptools.packages.find]
+include = ["chess_rl_miles*"]

@@ -1,0 +1,34 @@
+# caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.DS_Store
+*.log
+
+# JavaScript dependencies and build outputs
+node_modules/
+.next/
+dist/
+build/
+coverage/
+
+# environments
+.venv/
+venv/
+.env
+.env.*
+!.env.example
+
+# data and weights never belong here (see docs/08-data-and-artifacts.md)
+*.parquet
+*.npy
+*.safetensors
+*.pt
+*.bin
+chess/eval/test_data/*.parquet
+
+# local run scratch
+wandb/
+tmp_*.json
+.modal-launch-recovery/

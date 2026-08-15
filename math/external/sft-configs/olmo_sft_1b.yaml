@@ -1,0 +1,43 @@
+### model — filled in at runtime via CLI override
+model_name_or_path:
+trust_remote_code: true
+
+### method
+stage: sft
+do_train: true
+finetuning_type: full
+deepspeed: examples/deepspeed/ds_z1_config.json  # ZeRO-1 — 1B doesn't need z3
+packing: true
+enable_liger_kernel: true      # chunked CE loss — avoids materializing 16×8192×100k logits (needed for OLMo-2's 100k vocab)
+flash_attn: sdpa               # torch native SDPA — avoids flash-attn/torch ABI mismatch on Modal image
+
+### dataset
+dataset: openthoughts_merged_think_39k
+template: olmo2
+cutoff_len: 8192
+max_samples: 1000000
+overwrite_cache: true
+preprocessing_num_workers: 16
+dataloader_persistent_workers: true
+dataloader_pin_memory: true
+dataloader_num_workers: 4
+
+### output
+logging_steps: 10
+save_strategy: epoch          # save at end of each epoch; save_total_limit keeps only the last
+save_total_limit: 1
+plot_loss: true
+overwrite_output_dir: true
+save_only_model: true         # skip optim states in the final save
+report_to: wandb              # override via env if needed
+run_name: sft-olmo-1b
+
+### train — DEFAULTS FOR 1B; individual jobs may override
+per_device_train_batch_size: 16   # was 4 for 7B; H200 has ample memory
+gradient_accumulation_steps: 2    # 8 GPUs × 16 × 2 = 256 effective (same as 7B)
+learning_rate: 1.0e-5
+num_train_epochs: 3.0
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+bf16: true
+ddp_timeout: 180000000

@@ -1,0 +1,19 @@
+{
+  "calls": [
+    {
+      "function_call_id": "fc-01M00YJAG5ZQN3DV939TM86FQ6",
+      "leg": 1
+    },
+    {
+      "function_call_id": "fc-01M00Z5G289VFE32SK81HJFNAS",
+      "leg": 2
+    }
+  ],
+  "contract_sha256": "5d77114556343303b32c75349e6ffb84993c5c0e44731bd6dd0917ab92488d3d",
+  "error": "OSError: [Errno 22] Invalid argument: '/__modal/volumes/vo-HLlrbEyyP1xIPD2Da2pcJ4/interleave_50m/rl_hf_fp32_master_v3/.precision_resume_5d77114556343303b32c_step2_fp32.64s1hsiy.incomplete -> /__modal/volumes/vo-HLlrbEyyP1xIPD2Da2pcJ4/interleave_50m/rl_hf_fp32_master_v3/precision_resume_5d77114556343303b32c_step2_fp32'",
+  "expected_training_call_count": 2,
+  "finalizer_call_id": "fc-01M00ZMMJEG15Q23N69K08SWQZ",
+  "ledger_sha256": "3211df841595c7097e245a06c95da3d784e01b6f6b819828f5719e1a68f3f436",
+  "schema": "chess-rl-miles-precision-gate-launch-ledger-v1",
+  "state": "failed"
+}

@@ -1,0 +1,48 @@
+### model — filled in at runtime via CLI override
+model_name_or_path:
+trust_remote_code: true
+
+### method
+stage: sft
+do_train: true
+finetuning_type: full
+deepspeed: examples/deepspeed/ds_z1_config.json
+packing: false                # user requested: no packing (each example own seq)
+enable_liger_kernel: true      # chunked CE for 100k vocab
+flash_attn: sdpa               # avoid flash-attn ABI mismatch
+
+### dataset
+dataset: numinamath_cot
+template: olmo2
+cutoff_len: 4096
+max_samples: 1000000000
+overwrite_cache: true
+preprocessing_num_workers: 32
+dataloader_persistent_workers: true
+dataloader_pin_memory: true
+dataloader_num_workers: 4
+train_on_prompt: false          # loss only on assistant tokens
+mask_history: false
+# Filter examples whose (prompt + response) token count exceeds cutoff_len.
+# `truncate` (default) would silently cut; we want to drop.
+neat_packing: false
+
+### output
+logging_steps: 20
+save_strategy: epoch
+save_total_limit: 1
+plot_loss: true
+overwrite_output_dir: true
+save_only_model: true
+report_to: wandb
+run_name: sft-olmo-1b-numinamath
+
+### train
+per_device_train_batch_size: 32   # 8 gpu × 32 × 2 = 512 effective; cutoff=4096 leaves lots of memory
+gradient_accumulation_steps: 2
+learning_rate: 1.0e-5
+num_train_epochs: 1.0
+lr_scheduler_type: cosine
+warmup_ratio: 0.03
+bf16: true
+ddp_timeout: 180000000

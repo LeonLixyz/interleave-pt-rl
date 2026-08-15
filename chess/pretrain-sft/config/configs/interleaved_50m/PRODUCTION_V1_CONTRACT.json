@@ -1,0 +1,41 @@
+{
+  "schema": "interleaved-50m-production-contract-v1",
+  "decision_timestamp": "2026-07-30T03:37:35-04:00",
+  "experiment_version": "mix10b_sft90k_3072_v1_20260730",
+  "topology": {
+    "gpu_type": "H200",
+    "world_size": 8,
+    "local_batch_size": 21,
+    "gradient_accumulation_steps": 1,
+    "sequence_length": 3072,
+    "token_positions_per_update": 516096
+  },
+  "performance_contract": {
+    "attention_backend": "sdpa",
+    "torch_compile_mode": "none",
+    "data_num_workers_per_rank": 8,
+    "persistent_workers": true,
+    "flash_attention_version": null,
+    "remote_tracker_backend": "none",
+    "metrics_format": "interleaved-local-metrics-v1",
+    "metrics_path": "<run_root>/metrics.jsonl"
+  },
+  "gate_benchmark": {
+    "modal_app_id": "ap-Vnag7lpPH92HwWlRtENvn3",
+    "modal_function_call_id": "fc-01KYRYT1GYRZH9B6ETVYGDB7FX",
+    "warmup_steps": 10,
+    "measured_steps": 20,
+    "mean_step_seconds": 0.9151884959500002,
+    "p50_step_seconds": 0.7026360930000024,
+    "p90_step_seconds": 1.595989310300002,
+    "mean_data_seconds": 0.004010364499996655,
+    "mean_compute_seconds": 0.9111781314500036,
+    "token_positions_per_second": 563923.1724217347,
+    "max_cuda_memory_allocated_bytes": 35486330368,
+    "first_step_loss": 4.4960103034973145,
+    "checkpointing_during_measurement": false,
+    "hf_export_during_measurement": false,
+    "tracker_during_measurement": false
+  },
+  "decision": "Production v1 is frozen to explicit SDPA without torch.compile. Scientific outputs use a local append-only JSONL metric log and do not depend on remote tracker authentication. FlashAttention 2 comparisons are future optimization evidence only and must not mutate this experiment after launch."
+}

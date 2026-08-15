@@ -1,0 +1,19 @@
+{
+  "calls": [
+    {
+      "function_call_id": "fc-01M011TBKBQDAFFFD4D0RH51J0",
+      "leg": 1
+    },
+    {
+      "function_call_id": "fc-01M012FCGAS3HJWGT5X90D4PA1",
+      "leg": 2
+    }
+  ],
+  "contract_sha256": "f5b8ce81a9fc1a586d72b6ca110d4c0e7898894a1969b86c192ad923044d7b8d",
+  "error": "OSError: [Errno 22] Invalid argument: '/rl-checkpoints/chess-rl-miles-interleave-fp32-master-v3/_precision_resume_gates/.f5b8ce81a9fc1a586d72b6ca110d4c0e7898894a1969b86c192ad923044d7b8d.2.1786743264797766559.incomplete -> /rl-checkpoints/chess-rl-miles-interleave-fp32-master-v3/_precision_resume_gates/f5b8ce81a9fc1a586d72b6ca110d4c0e7898894a1969b86c192ad923044d7b8d'",
+  "expected_training_call_count": 2,
+  "finalizer_call_id": "fc-01M0132CGYNSRZEX7YGH0QATAG",
+  "ledger_sha256": "f2e6b9d24a44336332eddea69279871684a4bc3d76f75d4fa180ce4d89f7b3be",
+  "schema": "chess-rl-miles-precision-gate-launch-ledger-v1",
+  "state": "failed"
+}

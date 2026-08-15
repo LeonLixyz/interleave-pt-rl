@@ -1,0 +1,334 @@
+{
+  "default_max_train_files": 120,
+  "entries_by_spec": [
+    {
+      "total_compute": "9e18",
+      "modelsize": "100m",
+      "alpha": "0.279",
+      "beta": "0.03",
+      "max_train_files": 85
+    },
+    {
+      "total_compute": "9e18",
+      "modelsize": "100m",
+      "alpha": "0.509",
+      "beta": "0.03",
+      "max_train_files": 85
+    },
+    {
+      "total_compute": "9e18",
+      "modelsize": "100m",
+      "alpha": "0.740",
+      "beta": "0.03",
+      "max_train_files": 85
+    },
+    {
+      "total_compute": "9e18",
+      "modelsize": "200m",
+      "alpha": "0.049",
+      "beta": "0.03",
+      "max_train_files": 50
+    },
+    {
+      "total_compute": "9e18",
+      "modelsize": "200m",
+      "alpha": "0.279",
+      "beta": "0.03",
+      "max_train_files": 50
+    },
+    {
+      "total_compute": "9e18",
+      "modelsize": "200m",
+      "alpha": "0.509",
+      "beta": "0.03",
+      "max_train_files": 50
+    },
+    {
+      "total_compute": "9e18",
+      "modelsize": "200m",
+      "alpha": "0.740",
+      "beta": "0.03",
+      "max_train_files": 50
+    },
+    {
+      "total_compute": "9e18",
+      "modelsize": "200m",
+      "alpha": "0.970",
+      "beta": "0.03",
+      "max_train_files": 50
+    },
+    {
+      "total_compute": "9e18",
+      "modelsize": "400m",
+      "alpha": "0.049",
+      "beta": "0.03",
+      "max_train_files": 50
+    },
+    {
+      "total_compute": "9e18",
+      "modelsize": "400m",
+      "alpha": "0.279",
+      "beta": "0.03",
+      "max_train_files": 50
+    },
+    {
+      "total_compute": "9e18",
+      "modelsize": "400m",
+      "alpha": "0.509",
+      "beta": "0.03",
+      "max_train_files": 50
+    },
+    {
+      "total_compute": "9e18",
+      "modelsize": "400m",
+      "alpha": "0.740",
+      "beta": "0.03",
+      "max_train_files": 50
+    },
+    {
+      "total_compute": "9e18",
+      "modelsize": "400m",
+      "alpha": "0.970",
+      "beta": "0.03",
+      "max_train_files": 50
+    },
+    {
+      "total_compute": "9e18",
+      "modelsize": "800m",
+      "alpha": "0.049",
+      "beta": "0.03",
+      "max_train_files": 26
+    },
+    {
+      "total_compute": "9e18",
+      "modelsize": "800m",
+      "alpha": "0.279",
+      "beta": "0.03",
+      "max_train_files": 26
+    },
+    {
+      "total_compute": "9e18",
+      "modelsize": "800m",
+      "alpha": "0.509",
+      "beta": "0.03",
+      "max_train_files": 26
+    },
+    {
+      "total_compute": "9e18",
+      "modelsize": "800m",
+      "alpha": "0.740",
+      "beta": "0.03",
+      "max_train_files": 26
+    },
+    {
+      "total_compute": "9e18",
+      "modelsize": "800m",
+      "alpha": "0.970",
+      "beta": "0.03",
+      "max_train_files": 26
+    },
+    {
+      "total_compute": "6p5e18",
+      "modelsize": "50m",
+      "alpha": "0.400",
+      "beta": "0.045",
+      "max_train_files": 169
+    },
+    {
+      "total_compute": "6p5e18",
+      "modelsize": "50m",
+      "alpha": "0.750",
+      "beta": "0.045",
+      "max_train_files": 169
+    },
+    {
+      "total_compute": "6p5e18",
+      "modelsize": "100m",
+      "alpha": "0.050",
+      "beta": "0.045",
+      "max_train_files": 79
+    },
+    {
+      "total_compute": "6p5e18",
+      "modelsize": "100m",
+      "alpha": "0.200",
+      "beta": "0.045",
+      "max_train_files": 79
+    },
+    {
+      "total_compute": "6p5e18",
+      "modelsize": "100m",
+      "alpha": "0.400",
+      "beta": "0.045",
+      "max_train_files": 79
+    },
+    {
+      "total_compute": "6p5e18",
+      "modelsize": "100m",
+      "alpha": "0.750",
+      "beta": "0.045",
+      "max_train_files": 79
+    },
+    {
+      "total_compute": "6p5e18",
+      "modelsize": "100m",
+      "alpha": "0.950",
+      "beta": "0.045",
+      "max_train_files": 79
+    },
+    {
+      "total_compute": "6p5e18",
+      "modelsize": "200m",
+      "alpha": "0.050",
+      "beta": "0.045",
+      "max_train_files": 39
+    },
+    {
+      "total_compute": "6p5e18",
+      "modelsize": "200m",
+      "alpha": "0.200",
+      "beta": "0.045",
+      "max_train_files": 39
+    },
+    {
+      "total_compute": "6p5e18",
+      "modelsize": "200m",
+      "alpha": "0.400",
+      "beta": "0.045",
+      "max_train_files": 39
+    },
+    {
+      "total_compute": "6p5e18",
+      "modelsize": "200m",
+      "alpha": "0.750",
+      "beta": "0.045",
+      "max_train_files": 39
+    },
+    {
+      "total_compute": "6p5e18",
+      "modelsize": "200m",
+      "alpha": "0.950",
+      "beta": "0.045",
+      "max_train_files": 39
+    },
+    {
+      "total_compute": "3p3e19",
+      "modelsize": "200m",
+      "alpha": "0.750",
+      "beta": "0.009",
+      "max_train_files": 39
+    },
+    {
+      "total_compute": "3p3e19",
+      "modelsize": "200m",
+      "alpha": "0.400",
+      "beta": "0.009",
+      "max_train_files": 39
+    },
+    {
+      "total_compute": "6p5e18",
+      "modelsize": "410m",
+      "alpha": "0.050",
+      "beta": "0.045",
+      "max_train_files": 19
+    },
+    {
+      "total_compute": "6p5e18",
+      "modelsize": "410m",
+      "alpha": "0.200",
+      "beta": "0.045",
+      "max_train_files": 19
+    },
+    {
+      "total_compute": "6p5e18",
+      "modelsize": "410m",
+      "alpha": "0.400",
+      "beta": "0.045",
+      "max_train_files": 19
+    },
+    {
+      "total_compute": "6p5e18",
+      "modelsize": "410m",
+      "alpha": "0.750",
+      "beta": "0.045",
+      "max_train_files": 19
+    },
+    {
+      "total_compute": "6p5e18",
+      "modelsize": "410m",
+      "alpha": "0.950",
+      "beta": "0.045",
+      "max_train_files": 19
+    },
+    {
+      "total_compute": "6p5e18",
+      "modelsize": "670m",
+      "alpha": "0.050",
+      "beta": "0.045",
+      "max_train_files": 11
+    },
+    {
+      "total_compute": "6p5e18",
+      "modelsize": "670m",
+      "alpha": "0.200",
+      "beta": "0.045",
+      "max_train_files": 11
+    },
+    {
+      "total_compute": "6p5e18",
+      "modelsize": "670m",
+      "alpha": "0.400",
+      "beta": "0.045",
+      "max_train_files": 11
+    },
+    {
+      "total_compute": "6p5e18",
+      "modelsize": "670m",
+      "alpha": "0.750",
+      "beta": "0.045",
+      "max_train_files": 11
+    },
+    {
+      "total_compute": "6p5e18",
+      "modelsize": "670m",
+      "alpha": "0.950",
+      "beta": "0.045",
+      "max_train_files": 11
+    },
+    {
+      "total_compute": "6p5e18",
+      "modelsize": "1000m",
+      "alpha": "0.050",
+      "beta": "0.045",
+      "max_train_files": 7
+    },
+    {
+      "total_compute": "6p5e18",
+      "modelsize": "1000m",
+      "alpha": "0.200",
+      "beta": "0.045",
+      "max_train_files": 7
+    },
+    {
+      "total_compute": "6p5e18",
+      "modelsize": "1000m",
+      "alpha": "0.400",
+      "beta": "0.045",
+      "max_train_files": 7
+    },
+    {
+      "total_compute": "6p5e18",
+      "modelsize": "1000m",
+      "alpha": "0.750",
+      "beta": "0.045",
+      "max_train_files": 7
+    },
+    {
+      "total_compute": "6p5e18",
+      "modelsize": "1000m",
+      "alpha": "0.950",
+      "beta": "0.045",
+      "max_train_files": 7
+    }
+  ]
+}

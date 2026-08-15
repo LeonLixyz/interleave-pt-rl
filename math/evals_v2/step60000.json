@@ -1,0 +1,18 @@
+{
+  "hf_repo": "pre-to-post-olmo/math-1b-sft-openthoughts-from-step60000",
+  "per_dataset": {
+    "gsm8k": {
+      "n": 1319,
+      "correct": 145,
+      "accuracy": 0.10993176648976498
+    },
+    "skyeasy25k_eval": {
+      "split": "test",
+      "n": 300,
+      "correct": 0,
+      "accuracy": 0.0,
+      "prompt_col": "prompt(auto)",
+      "gold_col": "reward_model.ground_truth(auto)"
+    }
+  }
+}

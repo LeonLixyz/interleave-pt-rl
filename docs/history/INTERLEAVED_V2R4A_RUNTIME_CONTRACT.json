@@ -1,0 +1,133 @@
+{
+  "candidates": {
+    "6000": {
+      "endpoint_checkpoint_sha256": "17acd19dd1e89390c609a3f0f6c72ab543b8869f2d2ffd10528c8fe84cb20690",
+      "hf_directory_manifest_sha256": "3285baeb7c6ca4de2a320522906b031f6538c75106cb13fddc68194c96d23d70",
+      "hf_path": "/pretrain-checkpoints/interleave_50m/pretrain/mix10b_sft90k_3072_v2r3_diagnostic_20260730/p1_w4067c60eaba84b1e/snapshots/step_6000/hf",
+      "original_p1_eligible": false
+    },
+    "8000": {
+      "endpoint_checkpoint_sha256": "e1006a970b5b7c9c9e5aefdbae3c716740e69970c0bcb4bb32b4cbab7af43634",
+      "hf_directory_manifest_sha256": "13fde44ba75511e8cd7d23a9e73db507bade841fcc682dc2851261690e918758",
+      "hf_path": "/pretrain-checkpoints/interleave_50m/pretrain/mix10b_sft90k_3072_v2r3_diagnostic_20260730/p1_w4067c60eaba84b1e/snapshots/step_8000/hf",
+      "original_p1_eligible": false
+    },
+    "9920": {
+      "endpoint_checkpoint_sha256": "9a89d52a60b87b0f27108e5b08e33395757e374a4b59a592babb9435edb4b1c8",
+      "hf_directory_manifest_sha256": "49fe6fe87d78ba58ebd96cf154567bd1526b6c12a4193809652b875a7af5d186",
+      "hf_path": "/pretrain-checkpoints/interleave_50m/pretrain/mix10b_sft90k_3072_v2r3_diagnostic_20260730/p1_w4067c60eaba84b1e/snapshots/step_9920/hf",
+      "original_p1_eligible": true
+    }
+  },
+  "cells": [
+    {
+      "batch_label": "A",
+      "candidate_step": 6000,
+      "run_name": "v2r4a-gate-w190-s6000-batch-a"
+    },
+    {
+      "batch_label": "B",
+      "candidate_step": 6000,
+      "run_name": "v2r4a-gate-w190-s6000-batch-b"
+    },
+    {
+      "batch_label": "A",
+      "candidate_step": 8000,
+      "run_name": "v2r4a-gate-w190-s8000-batch-a"
+    },
+    {
+      "batch_label": "B",
+      "candidate_step": 8000,
+      "run_name": "v2r4a-gate-w190-s8000-batch-b"
+    },
+    {
+      "batch_label": "A",
+      "candidate_step": 9920,
+      "run_name": "v2r4a-gate-w190-s9920-batch-a"
+    },
+    {
+      "batch_label": "B",
+      "candidate_step": 9920,
+      "run_name": "v2r4a-gate-w190-s9920-batch-b"
+    }
+  ],
+  "contract_sha256": "3e201cfd9094815cf72a63058d4225b334e3e5cd77fc0d79fbe6379d48778c9d",
+  "endpoint_evaluators": {
+    "p2_sft_at_p1": "65551135a0eb3eac5e1b65447a499c5849c154ec75f16db762903198eb2bf920",
+    "pt_b1_b5": "80caa51691611ad89a2496e2ca89f1c4039777d1d1a9b663fc550a26cff585f0"
+  },
+  "model_id": "interleave_47m_qwen3",
+  "plan": {
+    "path": "INTERLEAVED_V2R4A_GATE_AMENDMENT.md",
+    "sha256": "bff6abc2131b9ad2bc5e43138838793e89204aefe11a944ee68d248cc3a58a4e"
+  },
+  "prompt_batches": {
+    "A": {
+      "epoch0_prompt_order_sha256": "502dd02b274ef964b49d7e8b8fc187d12d9b8e27f90d5df6de03a7091d1c55d4",
+      "path": "/data/50m_interleaved_mix10b_sft90k_v2r1_clean_verify_gate/v2r4_production_gate_20260730/batch_a.parquet",
+      "prompt_set_sha256": "8d2f389ba1df4aa1594d8abb894941723158b4c4d072e1b54a9681ac8a7b89a2",
+      "rollout_seed": 1567877051,
+      "rows": 1024,
+      "sha256": "9002d22fd567a91de9d7a3a7ba2119d0a5e812a74d473d82dce2508c2eefd01d"
+    },
+    "B": {
+      "epoch0_prompt_order_sha256": "663d0a51dfab347900dab5fe32bd55adc5b98d424306cd4108ab605e4b6c6eb2",
+      "path": "/data/50m_interleaved_mix10b_sft90k_v2r1_clean_verify_gate/v2r4_production_gate_20260730/batch_b.parquet",
+      "prompt_set_sha256": "ceabf3581a9ea0bfbbe61430c22d24849d459aad03e17cbac356ee2c71ca9d74",
+      "rollout_seed": 923570888,
+      "rows": 1024,
+      "sha256": "1f9031efe2ea071c18d4beccb0c6394d1c3e10a4d962bfc2773ac5ad20d3c79e"
+    }
+  },
+  "prompt_manifest": {
+    "file_sha256": "a01bb692dd2f129c2463df91aab7006e4762a0ac55e6471f0708ef4db34ba126",
+    "manifest_sha256": "8ce046f9a560c7227ad33cc5f2baecc79d210e6f703c73e895469c1d566c6af5",
+    "path": "/data/50m_interleaved_mix10b_sft90k_v2r1_clean_verify_gate/v2r4_production_gate_20260730/prompt_batches_manifest.json"
+  },
+  "runtime": {
+    "gpu_type": "H200",
+    "gpus_per_node": 8,
+    "host_memory_gb": 192,
+    "max_tokens_per_gpu": 131072,
+    "miles_image": "radixark/miles@sha256:5b41bff2ecd42f1e71b5d8658e777541a821ef96556ae06b48333d521e0ca25e",
+    "sglang_server_concurrency": 128
+  },
+  "schema": "interleaved-v2r4a-production-gate-runtime-contract-v1",
+  "semantics": {
+    "automatic_retries": 0,
+    "checkpoint_saves": false,
+    "data_source_path": "chess_rl_miles.gate_data_source.StrictEpochRolloutDataSource",
+    "debug_rollout_only": true,
+    "deterministic_inference": true,
+    "dynamic_filter": false,
+    "no_requeue": true,
+    "no_wrap": true,
+    "num_rollout": 4,
+    "partial_rollout": false,
+    "policy_updates": false,
+    "rollout_batch_size": 256,
+    "samples_per_prompt": 8,
+    "sampling_seed_rule": "rollout_seed_plus_global_sample_index_0_to_8191",
+    "task_exception_policy": "fail_without_prompt_replacement",
+    "total_prompt_groups": 1024,
+    "total_rows": 8192
+  },
+  "sources": {
+    "chess_rl_miles": {
+      "excluded_relatives": [
+        "chess_rl_miles/v2r4_contract_binding.py"
+      ],
+      "file_count": 38,
+      "manifest_format": "relative_path<TAB>bytes<TAB>sha256<NEWLINE>",
+      "manifest_sha256": "e7cd51377a676ba9e070bdad079c00f02277b12a798c5611aba99d19d355bb65",
+      "total_bytes": 422629
+    },
+    "miles": {
+      "file_count": 679,
+      "manifest_format": "relative_path<TAB>bytes<TAB>sha256<NEWLINE>",
+      "manifest_sha256": "9aeb9274e3c4d38ed2d2bdf80cd37df6b5ad3cb0202775de443bf1c6d60b9f0d",
+      "total_bytes": 3721726
+    }
+  },
+  "version": "v2r4a_production_gate_20260730"
+}
