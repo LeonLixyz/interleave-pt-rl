@@ -1,0 +1,30 @@
+schema: context2048-pt-sft-trace-rl-experiment-v1
+extends: ../shared.yaml
+experiment:
+  key: pt2p5b_sft3half_rl1500_reset_pt2p5b_sft3half_trace_mixed_rl1500
+  matrix: 5b_total_pt
+  description: First 2.5B PT half, RL1500, reset, second 2.5B PT half with ordinary SFT and RL traces uniformly mixed, then RL1500
+  total_pt_target_tokens: 5000000000
+stages:
+  - id: pt_first
+    kind: pt_sft_mixed
+    model_from: canonical_seeded_initialization
+    pt_target_tokens: 2500000000
+    sft_exposures: 116575
+    placement_seed: 520200
+  - id: rl_first
+    kind: rl
+    model_from: pt_first
+    updates: 1500
+  - id: pt_second
+    kind: pt_sft_trace_mixed
+    model_from: pt_first
+    traces_from: rl_first
+    pt_target_tokens: 2500000000
+    sft_exposures: 116576
+    placement_seed: 520207
+    trace_order: chronological
+  - id: rl_final
+    kind: rl
+    model_from: pt_second
+    updates: 1500

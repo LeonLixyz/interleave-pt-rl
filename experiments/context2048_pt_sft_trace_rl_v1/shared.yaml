@@ -1,0 +1,148 @@
+schema: context2048-pt-sft-trace-rl-shared-v1
+version: context2048-pt-sft-trace-rl-fp32-master-v1-20260815
+seed: 42
+
+model:
+  architecture: context2048_47m_qwen3
+  context_length: 2048
+  vocab_size: 85
+
+tokenizer:
+  mapping_sha256: f0366c5dc44ada849282959e67b172da79264c0b9336707c03648c430ccf0651
+  special_token_ids:
+    <bos>: 0
+    <eos>: 1
+    <unk>: 2
+    <T>: 81
+    </T>: 82
+    <sep>: 83
+    <call_env>: 84
+  exactly_one_bos: true
+  tokenizer_adds_bos: false
+
+precision:
+  master_parameters: float32
+  adam_moments: float32
+  forward_backward: bfloat16
+  gradient_reduction: float32
+  resumable_checkpoint: float32
+  hf_export: float32
+  inference_in_memory: bfloat16
+
+masking:
+  pt_targets: supervised
+  sft_prompt: masked
+  sft_reasoning_and_moves: supervised
+  environment_replies: masked
+  trace_prompt: masked
+  trace_reasoning_and_moves: supervised
+
+pretrain:
+  source_repo: chess-pre-to-post/pretrain_v1_20b
+  source_revision: 07dd1b7090ca5f0fb05ef624c26b20bff19483c8
+  selection_seed: 42
+  record_layout: packed_pt_with_one_explicit_leading_bos
+  bos_is_context_not_target: true
+  world_size: 8
+  local_sequences_per_rank: 16
+  global_sequences_per_update: 128
+  sequence_length: 2048
+  global_token_slots_per_update: 262144
+
+sft:
+  source_repo: Pre-to-Post-2/200M_SFT_dataset
+  source_revision: fd343bd28f6a40fc3dab4dcfb6e74c11b7a20b90
+  source_cache_sha256: 6e5b0553366d51ec3c95cb606b063919eed83efb79d11b187ba7d318b0fd60d5
+  rows: 77717
+  supervised_targets_per_copy: 52482753
+  copies: 3
+  total_exposures: 233151
+  record_layout: one_row_per_right_padded_sequence
+  mixing: uniform_stable_binary_placement_without_replacement
+  two_stage_exposure_split: [116575, 116576]
+
+trace:
+  source: authenticated_rollouts_from_first_rl_stage
+  acceptance:
+    reward: 1
+    legal_move: true
+    format_valid: true
+    exactly_one_closing_think_token: true
+    at_least_one_call_env: true
+    deduplicate_prompt_response: true
+  supervised_passes: 1
+  learning_rate: 1.0e-5
+  shuffle_seed: 42
+  chronological_sort: [rollout_id, prompt_occurrence, sample_index]
+  preserve_saved_token_ids_and_loss_masks: true
+  regenerate_or_retokenize: false
+
+rl:
+  learning_rate: 1.0e-5
+  optimizer:
+    name: AdamW
+    beta1: 0.9
+    beta2: 0.999
+    epsilon: 1.0e-8
+    weight_decay: 0.01
+  low_var_kl_coefficient: 0.001
+  prompts_per_update: 256
+  samples_per_prompt: 8
+  trajectories_per_update: 2048
+  max_tokens_per_gpu: 131072
+  sglang_concurrency: 128
+  rollout_seed: 42
+  deterministic_sample_index_inference: true
+  prompt_length: 512
+  response_length: 1536
+  context_length: 2048
+  save_interval: 40
+  train_parquet:
+    path: /data/chess-rl-data/train_v4_ctx2048_fp32masterv13_all4_intersection_mixed_outcome_1to15of16_multi_turn.parquet
+    rows: 28419
+    sha256: 024d423c1438a1bfc0ed24898732a842dc13542082e3ecefdb62f4d0f43cbcbc
+
+stage_defaults:
+  pt_sft_mixed:
+    optimizer:
+      name: AdamW
+      beta1: 0.9
+      beta2: 0.95
+      epsilon: 1.0e-8
+      weight_decay: 0.1
+      fresh: true
+    learning_rate:
+      schedule: linear_warmup_then_cosine
+      warmup_ratio: 0.05
+      peak: 1.0e-3
+      minimum: 1.0e-5
+    sft_mixing: uniform_stable_binary_placement_without_replacement
+  rl:
+    learning_rate: 1.0e-5
+    optimizer_state: fresh
+    train_parquet_from_shared_contract: true
+  trace_supervised:
+    learning_rate: 1.0e-5
+    optimizer:
+      name: AdamW
+      beta1: 0.9
+      beta2: 0.95
+      epsilon: 1.0e-8
+      weight_decay: 0.01
+      fresh: true
+    passes: 1
+  pt_sft_trace_mixed:
+    optimizer:
+      name: AdamW
+      beta1: 0.9
+      beta2: 0.95
+      epsilon: 1.0e-8
+      weight_decay: 0.1
+      fresh: true
+    learning_rate:
+      schedule: linear_warmup_then_cosine
+      warmup_ratio: 0.05
+      peak: 1.0e-3
+      minimum: 1.0e-5
+    sft_mixing: uniform_stable_binary_placement_without_replacement
+    trace_mixing: uniform_stable_three_way_placement_without_replacement

@@ -43,6 +43,7 @@ Every experiment is launched from one of these. Nothing else starts training.
 
 | Line | Launcher | Config it reads |
 |---|---|---|
+| chess context-2,048 PT/SFT/trace/RL matrix | `chess/pretrain-sft/modal_scripts/modal_context2048_pt_matrix.py` for the shared initial PT parents; downstream launchers consume the same resolved graph | `experiments/context2048_pt_sft_trace_rl_v1/shared.yaml` + one experiment YAML under `5b/` |
 | chess pretraining (all published results) | `chess/pretrain-sft/modal_scripts/launch_sft_injection_ablation.py` | `config/configs/interleaved_50m/base_3072.yaml` + explicit overrides in `_run_v2r1_leg` |
 | chess pretraining (original 50M DAG) | `chess/pretrain-sft/modal_scripts/launch_50m_interleaved.py` | same base config |
 | chess pretraining (20B fork) | `chess/pretrain-sft/modal_scripts/launch_50m_interleaved_20b.py` | same base config |
@@ -53,10 +54,12 @@ Every experiment is launched from one of these. Nothing else starts training.
 | math SFT | `math/sft.py` | `math/external/sft-configs/olmo_sft_1b_numinamath.yaml` |
 | math RL | `math/rl_train.py` | hydra overrides inside the file (no YAML of its own) |
 
-Two conventions worth knowing: the chess pretraining and RL launchers restate every
-hyperparameter as an explicit override so a config edit cannot silently change a run,
-and the math side has no YAML at all for pretraining and RL — the Python defaults *are*
-the config. The per-stage documents in `docs/` reproduce those values in tables.
+New context-2,048 experiments are defined by validated YAML graphs. The launcher
+still restates resolved values as explicit trainer overrides and records the resolved
+config hash, so a config edit cannot silently change a run. Older experiments retain
+their historical Python launchers. The math side has no YAML for pretraining and RL;
+the Python defaults are the config. The per-stage documents in `docs/` reproduce
+those values in tables.
 
 ## Three things that will bite you
 

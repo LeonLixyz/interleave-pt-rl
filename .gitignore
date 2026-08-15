@@ -32,3 +32,4 @@ chess/eval/test_data/*.parquet
 wandb/
 tmp_*.json
 .modal-launch-recovery/
+.launch-recovery/

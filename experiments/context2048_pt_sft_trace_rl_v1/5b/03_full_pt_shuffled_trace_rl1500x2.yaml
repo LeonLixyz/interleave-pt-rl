@@ -1,0 +1,27 @@
+schema: context2048-pt-sft-trace-rl-experiment-v1
+extends: ../shared.yaml
+experiment:
+  key: pt5b_sft3_mixed_rl1500_reset_shuffled_trace_rl1500
+  matrix: 5b_total_pt
+  description: Full 5B PT plus SFTx3, RL1500, reset to the complete pre-RL checkpoint, shuffled trace training, then RL1500
+  total_pt_target_tokens: 5000000000
+stages:
+  - id: pt_full
+    kind: pt_sft_mixed
+    model_from: canonical_seeded_initialization
+    pt_target_tokens: 5000000000
+    sft_exposures: 233151
+    placement_seed: 520100
+  - id: rl_first
+    kind: rl
+    model_from: pt_full
+    updates: 1500
+  - id: trace_train
+    kind: trace_supervised
+    model_from: pt_full
+    traces_from: rl_first
+    order: shuffled
+  - id: rl_final
+    kind: rl
+    model_from: trace_train
+    updates: 1500
